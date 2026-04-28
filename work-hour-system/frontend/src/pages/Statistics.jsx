@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, DatePicker, Row, Col, Statistic, message } from 'antd';
-import { BarChartOutlined, UsersOutlined, ClockCircleOutlined, TrendingUpOutlined } from '@ant-design/icons';
+import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { statisticsAPI, basicDataAPI } from '../utils/api';
 
@@ -87,7 +87,7 @@ const Statistics = () => {
               title="加班工时"
               value={personalStats?.overtimeHours || 0}
               suffix="小时"
-              prefix={<TrendingUpOutlined />}
+              prefix={<ArrowUpOutlined />}
               loading={loading}
             />
           </Card>
@@ -98,7 +98,7 @@ const Statistics = () => {
               title="工作天数"
               value={personalStats?.workDays || 0}
               suffix="天"
-              prefix={<UsersOutlined />}
+              prefix={<UserOutlined />}
               loading={loading}
             />
           </Card>
