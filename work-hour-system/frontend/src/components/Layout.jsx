@@ -43,6 +43,7 @@ const roleMenus = {
     { key: 'history', label: '工时历史', icon: <FileTextOutlined /> },
     { key: 'approval', label: '工时审批', icon: <CheckSquareOutlined /> },
     { key: 'statistics', label: '统计分析', icon: <BarChartOutlined /> },
+    { key: 'admin', label: '系统管理', icon: <SettingsOutlined /> },
   ],
   Director: [
     { key: 'workhour', label: '工时填报', icon: <ClockCircleOutlined /> },
@@ -58,6 +59,7 @@ const getPageTitle = (page) => {
     history: '工时历史',
     approval: '审批管理',
     statistics: '统计分析',
+    admin: '系统管理',
   };
   return titles[page] || '工时填报';
 };

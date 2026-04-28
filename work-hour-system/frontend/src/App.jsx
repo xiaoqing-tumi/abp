@@ -6,6 +6,7 @@ import WorkHourForm from './pages/WorkHourForm';
 import WorkHourList from './pages/WorkHourList';
 import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
+import AdminPanel from './pages/AdminPanel';
 import CustomLayout from './components/Layout';
 import { useAuth } from './stores/authStore';
 import './App.css';
@@ -42,6 +43,8 @@ function App() {
         return <ApprovalList />;
       case 'statistics':
         return <Statistics />;
+      case 'admin':
+        return <AdminPanel />;
       default:
         return <WorkHourForm workDate={new Date()} onSubmit={() => {}} />;
     }
