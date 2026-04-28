@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal, Form, Input, Select, Checkbox, Dropdown, Menu } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, FolderOpenOutlined, ReloadOutlined, TeamOutlined, ColumnWidthOutlined } from '@ant-design/icons';
+import { Table, Button, Card, Row, Col, message, Modal, Form, Input, Select, Checkbox, Dropdown } from 'antd';
+import { EditOutlined, DeleteOutlined, EyeOutlined, FolderOpenOutlined, ReloadOutlined, TeamOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import { basicDataAPI, workHourAPI } from '../utils/api';
 
 const { Option } = Select;
@@ -133,23 +133,23 @@ const AdminPanel = () => {
   };
 
   const userAllColumns = [
-    { key: 'personCode', title: '工号', width: 100 },
-    { key: 'name', title: '姓名', width: 100 },
-    { key: 'departmentName', title: '部门', width: 120 },
-    { key: 'role', title: '角色', width: 100 },
-    { key: 'status', title: '状态', width: 80 },
-    { key: 'email', title: '邮箱', width: 200 },
-    { key: 'actions', title: '操作', width: 180 },
+    { key: 'personCode', title: '工号' },
+    { key: 'name', title: '姓名' },
+    { key: 'departmentName', title: '部门' },
+    { key: 'role', title: '角色' },
+    { key: 'status', title: '状态' },
+    { key: 'email', title: '邮箱' },
+    { key: 'actions', title: '操作' },
   ];
 
   const projectAllColumns = [
-    { key: 'projectCode', title: '项目编号', width: 120 },
-    { key: 'projectName', title: '项目名称', width: 150 },
-    { key: 'managerName', title: '项目经理', width: 120 },
-    { key: 'status', title: '状态', width: 80 },
-    { key: 'startDate', title: '开始日期', width: 120 },
-    { key: 'endDate', title: '结束日期', width: 120 },
-    { key: 'actions', title: '操作', width: 100 },
+    { key: 'projectCode', title: '项目编号' },
+    { key: 'projectName', title: '项目名称' },
+    { key: 'managerName', title: '项目经理' },
+    { key: 'status', title: '状态' },
+    { key: 'startDate', title: '开始日期' },
+    { key: 'endDate', title: '结束日期' },
+    { key: 'actions', title: '操作' },
   ];
 
   const userColumns = useMemo(() => {
@@ -327,35 +327,29 @@ const AdminPanel = () => {
     }));
   };
 
-  const userColumnMenu = (
-    <Menu>
-      {userAllColumns.map((col) => (
-        <Menu.Item key={col.key}>
-          <Checkbox
-            checked={visibleUserColumns[col.key]}
-            onChange={() => handleUserColumnToggle(col.key)}
-          >
-            {col.title}
-          </Checkbox>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const userColumnMenuItems = userAllColumns.map((col) => ({
+    key: col.key,
+    label: (
+      <Checkbox
+        checked={visibleUserColumns[col.key]}
+        onChange={() => handleUserColumnToggle(col.key)}
+      >
+        {col.title}
+      </Checkbox>
+    ),
+  }));
 
-  const projectColumnMenu = (
-    <Menu>
-      {projectAllColumns.map((col) => (
-        <Menu.Item key={col.key}>
-          <Checkbox
-            checked={visibleProjectColumns[col.key]}
-            onChange={() => handleProjectColumnToggle(col.key)}
-          >
-            {col.title}
-          </Checkbox>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const projectColumnMenuItems = projectAllColumns.map((col) => ({
+    key: col.key,
+    label: (
+      <Checkbox
+        checked={visibleProjectColumns[col.key]}
+        onChange={() => handleProjectColumnToggle(col.key)}
+      >
+        {col.title}
+      </Checkbox>
+    ),
+  }));
 
   return (
     <Card
@@ -390,7 +384,7 @@ const AdminPanel = () => {
           >
             同步数据
           </Button>
-          <Dropdown overlay={activeTab === 'users' ? userColumnMenu : projectColumnMenu} trigger={['click']}>
+          <Dropdown menu={{ items: activeTab === 'users' ? userColumnMenuItems : projectColumnMenuItems }} trigger={['click']}>
             <Button type="default" icon={<ColumnWidthOutlined />}>
               列设置
             </Button>
@@ -432,7 +426,7 @@ const AdminPanel = () => {
 
       <Modal
         title={editingItem ? '编辑用户' : '添加用户'}
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
       >

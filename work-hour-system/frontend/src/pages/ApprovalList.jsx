@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Menu } from 'antd';
+import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown } from 'antd';
 import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
@@ -73,15 +73,15 @@ const ApprovalList = () => {
   };
 
   const allColumns = [
-    { key: 'personName', title: '提交人', width: 100 },
-    { key: 'departmentName', title: '部门', width: 120 },
-    { key: 'projectName', title: '项目', width: 150 },
-    { key: 'workDate', title: '日期', width: 120 },
-    { key: 'hours', title: '工时(小时)', width: 120 },
-    { key: 'workType', title: '工作类型', width: 100 },
-    { key: 'description', title: '描述', width: 150 },
-    { key: 'submitTime', title: '提交时间', width: 160 },
-    { key: 'actions', title: '操作', width: 180 },
+    { key: 'personName', title: '提交人' },
+    { key: 'departmentName', title: '部门' },
+    { key: 'projectName', title: '项目' },
+    { key: 'workDate', title: '日期' },
+    { key: 'hours', title: '工时(小时)' },
+    { key: 'workType', title: '工作类型' },
+    { key: 'description', title: '描述' },
+    { key: 'submitTime', title: '提交时间' },
+    { key: 'actions', title: '操作' },
   ];
 
   const columns = useMemo(() => {
@@ -200,20 +200,17 @@ const ApprovalList = () => {
     }));
   };
 
-  const columnMenu = (
-    <Menu>
-      {allColumns.map((col) => (
-        <Menu.Item key={col.key}>
-          <Checkbox
-            checked={visibleColumns[col.key]}
-            onChange={() => handleColumnToggle(col.key)}
-          >
-            {col.title}
-          </Checkbox>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const columnMenuItems = allColumns.map((col) => ({
+    key: col.key,
+    label: (
+      <Checkbox
+        checked={visibleColumns[col.key]}
+        onChange={() => handleColumnToggle(col.key)}
+      >
+        {col.title}
+      </Checkbox>
+    ),
+  }));
 
   return (
     <Card
@@ -232,7 +229,7 @@ const ApprovalList = () => {
           <div style={{ color: '#faad14', fontWeight: 500 }}>
             待审批: {data.length} 条
           </div>
-          <Dropdown overlay={columnMenu} trigger={['click']}>
+          <Dropdown menu={{ items: columnMenuItems }} trigger={['click']}>
             <Button type="default" icon={<ColumnWidthOutlined />}>
               列设置
             </Button>
@@ -257,7 +254,7 @@ const ApprovalList = () => {
 
       <Modal
         title="工时详情"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
         width={500}
@@ -276,42 +273,36 @@ const ApprovalList = () => {
             </Row>
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作日期</div>
-                <div style={{ fontSize: 16 }}>
-                  {dayjs(selectedItem.workDate).format('YYYY-MM-DD')}
-                </div>
-              </Col>
-              <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工时</div>
-                <div style={{ fontSize: 16, color: '#1890ff' }}>
-                  {selectedItem.hours} 小时
-                </div>
-              </Col>
-            </Row>
-            <Row gutter={16} style={{ marginBottom: 16 }}>
-              <Col span={12}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>项目</div>
                 <div style={{ fontSize: 16 }}>{selectedItem.projectName}</div>
               </Col>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作类型</div>
-                <div style={{ fontSize: 16 }}>
-                  {selectedItem.workType === 'normal' ? '正常工时' : '加班'}
-                </div>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>日期</div>
+                <div style={{ fontSize: 16 }}>{dayjs(selectedItem.workDate).format('YYYY-MM-DD')}</div>
               </Col>
             </Row>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作描述</div>
-              <div style={{ fontSize: 16, lineHeight: 1.6 }}>
-                {selectedItem.description || '-'}
-              </div>
-            </div>
-            <div style={{ paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
-              <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>提交时间</div>
-              <div style={{ fontSize: 14, color: '#999' }}>
-                {dayjs(selectedItem.submitTime).format('YYYY-MM-DD HH:mm:ss')}
-              </div>
-            </div>
+            <Row gutter={16} style={{ marginBottom: 16 }}>
+              <Col span={12}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工时</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.hours} 小时</div>
+              </Col>
+              <Col span={12}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作类型</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.workType === 'normal' ? '正常工时' : '加班'}</div>
+              </Col>
+            </Row>
+            <Row gutter={16} style={{ marginBottom: 16 }}>
+              <Col span={24}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作描述</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.description || '无'}</div>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={24}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>提交时间</div>
+                <div style={{ fontSize: 16 }}>{dayjs(selectedItem.submitTime).format('YYYY-MM-DD HH:mm')}</div>
+              </Col>
+            </Row>
           </div>
         )}
       </Modal>

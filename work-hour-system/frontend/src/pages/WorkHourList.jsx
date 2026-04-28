@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Menu } from 'antd';
+import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown } from 'antd';
 import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
@@ -119,13 +119,13 @@ const WorkHourList = () => {
   };
 
   const allColumns = [
-    { key: 'workDate', title: '日期', width: 120 },
-    { key: 'projectName', title: '项目', width: 150 },
-    { key: 'hours', title: '工时(小时)', width: 120 },
-    { key: 'workType', title: '工作类型', width: 100 },
-    { key: 'status', title: '状态', width: 100 },
-    { key: 'source', title: '来源', width: 80 },
-    { key: 'actions', title: '操作', width: 200 },
+    { key: 'workDate', title: '日期' },
+    { key: 'projectName', title: '项目' },
+    { key: 'hours', title: '工时(小时)' },
+    { key: 'workType', title: '工作类型' },
+    { key: 'status', title: '状态' },
+    { key: 'source', title: '来源' },
+    { key: 'actions', title: '操作' },
   ];
 
   const columns = useMemo(() => {
@@ -263,20 +263,17 @@ const WorkHourList = () => {
     }));
   };
 
-  const columnMenu = (
-    <Menu>
-      {allColumns.map((col) => (
-        <Menu.Item key={col.key}>
-          <Checkbox
-            checked={visibleColumns[col.key]}
-            onChange={() => handleColumnToggle(col.key)}
-          >
-            {col.title}
-          </Checkbox>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+  const columnMenuItems = allColumns.map((col) => ({
+    key: col.key,
+    label: (
+      <Checkbox
+        checked={visibleColumns[col.key]}
+        onChange={() => handleColumnToggle(col.key)}
+      >
+        {col.title}
+      </Checkbox>
+    ),
+  }));
 
   return (
     <Card
@@ -311,7 +308,7 @@ const WorkHourList = () => {
             </Select>
           </div>
         </div>
-        <Dropdown overlay={columnMenu} trigger={['click']}>
+        <Dropdown menu={{ items: columnMenuItems }} trigger={['click']}>
           <Button type="default" icon={<ColumnWidthOutlined />}>
             列设置
           </Button>
@@ -335,7 +332,7 @@ const WorkHourList = () => {
 
       <Modal
         title="编辑工时"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={null}
       >
