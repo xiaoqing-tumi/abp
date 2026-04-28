@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { useState, useEffect, useMemo } from 'react';
+import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Menu } from 'antd';
+import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -9,6 +9,17 @@ const ApprovalList = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    personName: true,
+    departmentName: true,
+    projectName: true,
+    workDate: true,
+    hours: true,
+    workType: true,
+    description: true,
+    submitTime: true,
+    actions: true,
+  });
 
   useEffect(() => {
     fetchPendingApprovals();
@@ -61,92 +72,148 @@ const ApprovalList = () => {
     setIsModalVisible(true);
   };
 
-  const columns = [
-    {
-      title: '提交人',
-      dataIndex: 'personName',
-      key: 'personName',
-      width: 100,
-    },
-    {
-      title: '部门',
-      dataIndex: 'departmentName',
-      key: 'departmentName',
-      width: 120,
-    },
-    {
-      title: '日期',
-      dataIndex: 'workDate',
-      key: 'workDate',
-      render: (text) => dayjs(text).format('YYYY-MM-DD'),
-      width: 120,
-    },
-    {
-      title: '项目',
-      dataIndex: 'projectName',
-      key: 'projectName',
-      ellipsis: true,
-    },
-    {
-      title: '工时(小时)',
-      dataIndex: 'hours',
-      key: 'hours',
-      width: 120,
-    },
-    {
-      title: '工作类型',
-      dataIndex: 'workType',
-      key: 'workType',
-      width: 100,
-      render: (text) => (text === 'normal' ? '正常工时' : '加班'),
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-    },
-    {
-      title: '提交时间',
-      dataIndex: 'submitTime',
-      key: 'submitTime',
-      render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm'),
-      width: 160,
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 180,
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button
-            type="text"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-          >
-            详情
-          </Button>
-          <Button
-            type="primary"
-            size="small"
-            icon={<CheckOutlined />}
-            onClick={() => handleApprove(record.id)}
-          >
-            通过
-          </Button>
-          <Button
-            danger
-            size="small"
-            icon={<CloseOutlined />}
-            onClick={() => handleReject(record.id)}
-          >
-            驳回
-          </Button>
-        </div>
-      ),
-    },
+  const allColumns = [
+    { key: 'personName', title: '提交人', width: 100 },
+    { key: 'departmentName', title: '部门', width: 120 },
+    { key: 'projectName', title: '项目', width: 150 },
+    { key: 'workDate', title: '日期', width: 120 },
+    { key: 'hours', title: '工时(小时)', width: 120 },
+    { key: 'workType', title: '工作类型', width: 100 },
+    { key: 'description', title: '描述', width: 150 },
+    { key: 'submitTime', title: '提交时间', width: 160 },
+    { key: 'actions', title: '操作', width: 180 },
   ];
+
+  const columns = useMemo(() => {
+    const result = [];
+    if (visibleColumns.personName) {
+      result.push({
+        title: '提交人',
+        dataIndex: 'personName',
+        key: 'personName',
+        width: 100,
+      });
+    }
+    if (visibleColumns.departmentName) {
+      result.push({
+        title: '部门',
+        dataIndex: 'departmentName',
+        key: 'departmentName',
+        width: 120,
+      });
+    }
+    if (visibleColumns.projectName) {
+      result.push({
+        title: '项目',
+        dataIndex: 'projectName',
+        key: 'projectName',
+        ellipsis: true,
+        width: 150,
+      });
+    }
+    if (visibleColumns.workDate) {
+      result.push({
+        title: '日期',
+        dataIndex: 'workDate',
+        key: 'workDate',
+        render: (text) => dayjs(text).format('YYYY-MM-DD'),
+        width: 120,
+      });
+    }
+    if (visibleColumns.hours) {
+      result.push({
+        title: '工时(小时)',
+        dataIndex: 'hours',
+        key: 'hours',
+        width: 120,
+      });
+    }
+    if (visibleColumns.workType) {
+      result.push({
+        title: '工作类型',
+        dataIndex: 'workType',
+        key: 'workType',
+        width: 100,
+        render: (text) => (text === 'normal' ? '正常工时' : '加班'),
+      });
+    }
+    if (visibleColumns.description) {
+      result.push({
+        title: '描述',
+        dataIndex: 'description',
+        key: 'description',
+        ellipsis: true,
+        width: 150,
+      });
+    }
+    if (visibleColumns.submitTime) {
+      result.push({
+        title: '提交时间',
+        dataIndex: 'submitTime',
+        key: 'submitTime',
+        render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm'),
+        width: 160,
+      });
+    }
+    if (visibleColumns.actions) {
+      result.push({
+        title: '操作',
+        key: 'actions',
+        width: 180,
+        render: (_, record) => (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button
+              type="text"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => handleView(record)}
+            >
+              详情
+            </Button>
+            <Button
+              type="primary"
+              size="small"
+              icon={<CheckOutlined />}
+              onClick={() => handleApprove(record.id)}
+            >
+              通过
+            </Button>
+            <Button
+              danger
+              size="small"
+              icon={<CloseOutlined />}
+              onClick={() => handleReject(record.id)}
+            >
+              驳回
+            </Button>
+          </div>
+        ),
+      });
+    }
+    return result;
+  }, [visibleColumns]);
+
+  const handleColumnToggle = (columnKey) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey],
+    }));
+  };
+
+  const columnMenu = (
+    <Menu>
+      {allColumns.map((col) => (
+        <Menu.Item key={col.key}>
+          <Checkbox
+            checked={visibleColumns[col.key]}
+            onChange={() => handleColumnToggle(col.key)}
+          >
+            {col.title}
+          </Checkbox>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
 
   return (
     <Card
@@ -161,8 +228,15 @@ const ApprovalList = () => {
           <SearchOutlined style={{ color: '#999' }} />
           <span style={{ fontWeight: 600, fontSize: 16 }}>待审批列表</span>
         </div>
-        <div style={{ color: '#faad14', fontWeight: 500 }}>
-          待审批: {data.length} 条
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ color: '#faad14', fontWeight: 500 }}>
+            待审批: {data.length} 条
+          </div>
+          <Dropdown overlay={columnMenu} trigger={['click']}>
+            <Button type="default" icon={<ColumnWidthOutlined />}>
+              列设置
+            </Button>
+          </Dropdown>
         </div>
       </Row>
 

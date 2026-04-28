@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
+import { useState, useEffect, useMemo } from 'react';
+import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Menu } from 'antd';
+import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -15,6 +15,15 @@ const WorkHourList = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form] = Form.useForm();
+  const [visibleColumns, setVisibleColumns] = useState({
+    workDate: true,
+    projectName: true,
+    hours: true,
+    workType: true,
+    status: true,
+    source: true,
+    actions: true,
+  });
 
   useEffect(() => {
     fetchWorkHours();
@@ -109,116 +118,165 @@ const WorkHourList = () => {
     }
   };
 
-  const columns = [
-    {
-      title: '日期',
-      dataIndex: 'workDate',
-      key: 'workDate',
-      render: (text) => dayjs(text).format('YYYY-MM-DD'),
-      width: 120,
-    },
-    {
-      title: '项目',
-      dataIndex: 'projectName',
-      key: 'projectName',
-      ellipsis: true,
-    },
-    {
-      title: '工时(小时)',
-      dataIndex: 'hours',
-      key: 'hours',
-      width: 120,
-    },
-    {
-      title: '工作类型',
-      dataIndex: 'workType',
-      key: 'workType',
-      width: 100,
-      render: (text) => (text === 'normal' ? '正常工时' : '加班'),
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      render: (text) => {
-        const statusMap = {
-          draft: { label: '草稿', color: 'gray' },
-          submitted: { label: '已提交', color: 'blue' },
-          approved: { label: '已审批', color: 'green' },
-        };
-        const status = statusMap[text] || { label: text, color: 'gray' };
-        return (
-          <span
-            style={{
-              padding: '4px 12px',
-              borderRadius: 4,
-              backgroundColor: status.color === 'green' ? '#f6ffed' : status.color === 'blue' ? '#e6f7ff' : '#f5f5f5',
-              color: status.color === 'green' ? '#52c41a' : status.color === 'blue' ? '#1890ff' : '#666',
-              fontSize: 12,
-            }}
-          >
-            {status.label}
-          </span>
-        );
-      },
-    },
-    {
-      title: '来源',
-      dataIndex: 'source',
-      key: 'source',
-      width: 80,
-      render: (text) => (text === 'auto' ? '系统自动' : '手动填报'),
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 200,
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: 8 }}>
-          {record.status === 'draft' && (
-            <>
-              <Button
-                type="text"
-                size="small"
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(record)}
-              >
-                编辑
-              </Button>
-              <Button
-                type="text"
-                danger
-                size="small"
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(record.id)}
-              >
-                删除
-              </Button>
-              <Button
-                type="primary"
-                size="small"
-                icon={<SendOutlined />}
-                onClick={() => handleSubmit(record.id)}
-              >
-                提交
-              </Button>
-            </>
-          )}
-          {record.status !== 'draft' && (
-            <Button
-              type="text"
-              size="small"
-              icon={<EyeOutlined />}
-              onClick={() => handleView(record)}
-            >
-              查看
-            </Button>
-          )}
-        </div>
-      ),
-    },
+  const allColumns = [
+    { key: 'workDate', title: '日期', width: 120 },
+    { key: 'projectName', title: '项目', width: 150 },
+    { key: 'hours', title: '工时(小时)', width: 120 },
+    { key: 'workType', title: '工作类型', width: 100 },
+    { key: 'status', title: '状态', width: 100 },
+    { key: 'source', title: '来源', width: 80 },
+    { key: 'actions', title: '操作', width: 200 },
   ];
+
+  const columns = useMemo(() => {
+    const result = [];
+    if (visibleColumns.workDate) {
+      result.push({
+        title: '日期',
+        dataIndex: 'workDate',
+        key: 'workDate',
+        render: (text) => dayjs(text).format('YYYY-MM-DD'),
+        width: 120,
+      });
+    }
+    if (visibleColumns.projectName) {
+      result.push({
+        title: '项目',
+        dataIndex: 'projectName',
+        key: 'projectName',
+        ellipsis: true,
+        width: 150,
+      });
+    }
+    if (visibleColumns.hours) {
+      result.push({
+        title: '工时(小时)',
+        dataIndex: 'hours',
+        key: 'hours',
+        width: 120,
+      });
+    }
+    if (visibleColumns.workType) {
+      result.push({
+        title: '工作类型',
+        dataIndex: 'workType',
+        key: 'workType',
+        width: 100,
+        render: (text) => (text === 'normal' ? '正常工时' : '加班'),
+      });
+    }
+    if (visibleColumns.status) {
+      result.push({
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        width: 100,
+        render: (text) => {
+          const statusMap = {
+            draft: { label: '草稿', color: 'gray' },
+            submitted: { label: '已提交', color: 'blue' },
+            approved: { label: '已审批', color: 'green' },
+          };
+          const status = statusMap[text] || { label: text, color: 'gray' };
+          return (
+            <span
+              style={{
+                padding: '4px 12px',
+                borderRadius: 4,
+                backgroundColor: status.color === 'green' ? '#f6ffed' : status.color === 'blue' ? '#e6f7ff' : '#f5f5f5',
+                color: status.color === 'green' ? '#52c41a' : status.color === 'blue' ? '#1890ff' : '#666',
+                fontSize: 12,
+              }}
+            >
+              {status.label}
+            </span>
+          );
+        },
+      });
+    }
+    if (visibleColumns.source) {
+      result.push({
+        title: '来源',
+        dataIndex: 'source',
+        key: 'source',
+        width: 80,
+        render: (text) => (text === 'auto' ? '系统自动' : '手动填报'),
+      });
+    }
+    if (visibleColumns.actions) {
+      result.push({
+        title: '操作',
+        key: 'actions',
+        width: 200,
+        render: (_, record) => (
+          <div style={{ display: 'flex', gap: 8 }}>
+            {record.status === 'draft' && (
+              <>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEdit(record)}
+                >
+                  编辑
+                </Button>
+                <Button
+                  type="text"
+                  danger
+                  size="small"
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record.id)}
+                >
+                  删除
+                </Button>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<SendOutlined />}
+                  onClick={() => handleSubmit(record.id)}
+                >
+                  提交
+                </Button>
+              </>
+            )}
+            {record.status !== 'draft' && (
+              <Button
+                type="text"
+                size="small"
+                icon={<EyeOutlined />}
+                onClick={() => handleView(record)}
+              >
+                查看
+              </Button>
+            )}
+          </div>
+        ),
+      });
+    }
+    return result;
+  }, [visibleColumns]);
+
+  const handleColumnToggle = (columnKey) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey],
+    }));
+  };
+
+  const columnMenu = (
+    <Menu>
+      {allColumns.map((col) => (
+        <Menu.Item key={col.key}>
+          <Checkbox
+            checked={visibleColumns[col.key]}
+            onChange={() => handleColumnToggle(col.key)}
+          >
+            {col.title}
+          </Checkbox>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
 
   return (
     <Card
@@ -228,8 +286,8 @@ const WorkHourList = () => {
         boxShadow: 'none',
       }}
     >
-      <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
-        <Col>
+      <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SearchOutlined style={{ color: '#999' }} />
             <RangePicker
@@ -238,8 +296,6 @@ const WorkHourList = () => {
               style={{ width: 280 }}
             />
           </div>
-        </Col>
-        <Col>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <FilterOutlined style={{ color: '#999' }} />
             <Select
@@ -254,7 +310,12 @@ const WorkHourList = () => {
               <Option value="approved">已审批</Option>
             </Select>
           </div>
-        </Col>
+        </div>
+        <Dropdown overlay={columnMenu} trigger={['click']}>
+          <Button type="default" icon={<ColumnWidthOutlined />}>
+            列设置
+          </Button>
+        </Dropdown>
       </Row>
 
       <Table

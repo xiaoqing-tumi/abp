@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal, Form, Input, Select } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, FolderOpenOutlined, ReloadOutlined, TeamOutlined } from '@ant-design/icons';
+import { useState, useEffect, useMemo } from 'react';
+import { Table, Button, Card, Row, Col, message, Modal, Form, Input, Select, Checkbox, Dropdown, Menu } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, FolderOpenOutlined, ReloadOutlined, TeamOutlined, ColumnWidthOutlined } from '@ant-design/icons';
 import { basicDataAPI, workHourAPI } from '../utils/api';
 
 const { Option } = Select;
@@ -13,6 +13,24 @@ const AdminPanel = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form] = Form.useForm();
+  const [visibleUserColumns, setVisibleUserColumns] = useState({
+    personCode: true,
+    name: true,
+    departmentName: true,
+    role: true,
+    status: true,
+    email: true,
+    actions: true,
+  });
+  const [visibleProjectColumns, setVisibleProjectColumns] = useState({
+    projectCode: true,
+    projectName: true,
+    managerName: true,
+    status: true,
+    startDate: true,
+    endDate: true,
+    actions: true,
+  });
 
   const roles = [
     { value: 'Admin', label: '管理员' },
@@ -114,132 +132,230 @@ const AdminPanel = () => {
     fetchProjects();
   };
 
-  const userColumns = [
-    {
-      title: '工号',
-      dataIndex: 'personCode',
-      key: 'personCode',
-      width: 100,
-    },
-    {
-      title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
-      width: 100,
-    },
-    {
-      title: '部门',
-      dataIndex: 'departmentName',
-      key: 'departmentName',
-      width: 120,
-    },
-    {
-      title: '角色',
-      dataIndex: 'role',
-      key: 'role',
-      width: 100,
-      render: (text) => roles.find(r => r.value === text)?.label || text,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 80,
-      render: (text) => (text === 1 ? '在职' : '离职'),
-    },
-    {
-      title: '邮箱',
-      dataIndex: 'email',
-      key: 'email',
-      ellipsis: true,
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 180,
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button
-            type="text"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record)}
-          >
-            查看
-          </Button>
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            编辑
-          </Button>
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.personCode)}
-          >
-            删除
-          </Button>
-        </div>
-      ),
-    },
+  const userAllColumns = [
+    { key: 'personCode', title: '工号', width: 100 },
+    { key: 'name', title: '姓名', width: 100 },
+    { key: 'departmentName', title: '部门', width: 120 },
+    { key: 'role', title: '角色', width: 100 },
+    { key: 'status', title: '状态', width: 80 },
+    { key: 'email', title: '邮箱', width: 200 },
+    { key: 'actions', title: '操作', width: 180 },
   ];
 
-  const projectColumns = [
-    {
-      title: '项目编号',
-      dataIndex: 'projectCode',
-      key: 'projectCode',
-      width: 120,
-    },
-    {
-      title: '项目名称',
-      dataIndex: 'projectName',
-      key: 'projectName',
-      ellipsis: true,
-    },
-    {
-      title: '项目经理',
-      dataIndex: 'managerName',
-      key: 'managerName',
-      width: 120,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 80,
-      render: (text) => (text === 1 ? '进行中' : '已结束'),
-    },
-    {
-      title: '开始日期',
-      dataIndex: 'startDate',
-      key: 'startDate',
-      width: 120,
-    },
-    {
-      title: '结束日期',
-      dataIndex: 'endDate',
-      key: 'endDate',
-      width: 120,
-      render: (text) => text || '-',
-    },
-    {
-      title: '操作',
-      key: 'actions',
-      width: 100,
-      render: () => (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button type="text" size="small" icon={<EditOutlined />}>编辑</Button>
-          <Button type="text" danger size="small" icon={<DeleteOutlined />}>删除</Button>
-        </div>
-      ),
-    },
+  const projectAllColumns = [
+    { key: 'projectCode', title: '项目编号', width: 120 },
+    { key: 'projectName', title: '项目名称', width: 150 },
+    { key: 'managerName', title: '项目经理', width: 120 },
+    { key: 'status', title: '状态', width: 80 },
+    { key: 'startDate', title: '开始日期', width: 120 },
+    { key: 'endDate', title: '结束日期', width: 120 },
+    { key: 'actions', title: '操作', width: 100 },
   ];
+
+  const userColumns = useMemo(() => {
+    const result = [];
+    if (visibleUserColumns.personCode) {
+      result.push({
+        title: '工号',
+        dataIndex: 'personCode',
+        key: 'personCode',
+        width: 100,
+      });
+    }
+    if (visibleUserColumns.name) {
+      result.push({
+        title: '姓名',
+        dataIndex: 'name',
+        key: 'name',
+        width: 100,
+      });
+    }
+    if (visibleUserColumns.departmentName) {
+      result.push({
+        title: '部门',
+        dataIndex: 'departmentName',
+        key: 'departmentName',
+        width: 120,
+      });
+    }
+    if (visibleUserColumns.role) {
+      result.push({
+        title: '角色',
+        dataIndex: 'role',
+        key: 'role',
+        width: 100,
+        render: (text) => roles.find(r => r.value === text)?.label || text,
+      });
+    }
+    if (visibleUserColumns.status) {
+      result.push({
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        width: 80,
+        render: (text) => (text === 1 ? '在职' : '离职'),
+      });
+    }
+    if (visibleUserColumns.email) {
+      result.push({
+        title: '邮箱',
+        dataIndex: 'email',
+        key: 'email',
+        ellipsis: true,
+        width: 200,
+      });
+    }
+    if (visibleUserColumns.actions) {
+      result.push({
+        title: '操作',
+        key: 'actions',
+        width: 180,
+        render: (_, record) => (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button
+              type="text"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => handleView(record)}
+            >
+              查看
+            </Button>
+            <Button
+              type="text"
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              编辑
+            </Button>
+            <Button
+              type="text"
+              danger
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.personCode)}
+            >
+              删除
+            </Button>
+          </div>
+        ),
+      });
+    }
+    return result;
+  }, [visibleUserColumns]);
+
+  const projectColumns = useMemo(() => {
+    const result = [];
+    if (visibleProjectColumns.projectCode) {
+      result.push({
+        title: '项目编号',
+        dataIndex: 'projectCode',
+        key: 'projectCode',
+        width: 120,
+      });
+    }
+    if (visibleProjectColumns.projectName) {
+      result.push({
+        title: '项目名称',
+        dataIndex: 'projectName',
+        key: 'projectName',
+        ellipsis: true,
+        width: 150,
+      });
+    }
+    if (visibleProjectColumns.managerName) {
+      result.push({
+        title: '项目经理',
+        dataIndex: 'managerName',
+        key: 'managerName',
+        width: 120,
+      });
+    }
+    if (visibleProjectColumns.status) {
+      result.push({
+        title: '状态',
+        dataIndex: 'status',
+        key: 'status',
+        width: 80,
+        render: (text) => (text === 1 ? '进行中' : '已结束'),
+      });
+    }
+    if (visibleProjectColumns.startDate) {
+      result.push({
+        title: '开始日期',
+        dataIndex: 'startDate',
+        key: 'startDate',
+        width: 120,
+      });
+    }
+    if (visibleProjectColumns.endDate) {
+      result.push({
+        title: '结束日期',
+        dataIndex: 'endDate',
+        key: 'endDate',
+        width: 120,
+        render: (text) => text || '-',
+      });
+    }
+    if (visibleProjectColumns.actions) {
+      result.push({
+        title: '操作',
+        key: 'actions',
+        width: 100,
+        render: () => (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button type="text" size="small" icon={<EditOutlined />}>编辑</Button>
+            <Button type="text" danger size="small" icon={<DeleteOutlined />}>删除</Button>
+          </div>
+        ),
+      });
+    }
+    return result;
+  }, [visibleProjectColumns]);
+
+  const handleUserColumnToggle = (columnKey) => {
+    setVisibleUserColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey],
+    }));
+  };
+
+  const handleProjectColumnToggle = (columnKey) => {
+    setVisibleProjectColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey],
+    }));
+  };
+
+  const userColumnMenu = (
+    <Menu>
+      {userAllColumns.map((col) => (
+        <Menu.Item key={col.key}>
+          <Checkbox
+            checked={visibleUserColumns[col.key]}
+            onChange={() => handleUserColumnToggle(col.key)}
+          >
+            {col.title}
+          </Checkbox>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
+
+  const projectColumnMenu = (
+    <Menu>
+      {projectAllColumns.map((col) => (
+        <Menu.Item key={col.key}>
+          <Checkbox
+            checked={visibleProjectColumns[col.key]}
+            onChange={() => handleProjectColumnToggle(col.key)}
+          >
+            {col.title}
+          </Checkbox>
+        </Menu.Item>
+      ))}
+    </Menu>
+  );
 
   return (
     <Card
@@ -266,13 +382,20 @@ const AdminPanel = () => {
             项目管理
           </Button>
         </div>
-        <Button
-          type="default"
-          icon={<ReloadOutlined />}
-          onClick={handleSyncData}
-        >
-          同步数据
-        </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Button
+            type="default"
+            icon={<ReloadOutlined />}
+            onClick={handleSyncData}
+          >
+            同步数据
+          </Button>
+          <Dropdown overlay={activeTab === 'users' ? userColumnMenu : projectColumnMenu} trigger={['click']}>
+            <Button type="default" icon={<ColumnWidthOutlined />}>
+              列设置
+            </Button>
+          </Dropdown>
+        </div>
       </Row>
 
       {activeTab === 'users' && (
