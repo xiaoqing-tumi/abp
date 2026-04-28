@@ -5,7 +5,7 @@ import { authAPI } from '../utils/api';
 
 const { Option } = Select;
 
-const Login = ({ onLoginSuccess, onLogin }) => {
+const Login = ({ onLoginSuccess }) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,9 +34,9 @@ const Login = ({ onLoginSuccess, onLogin }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data));
         message.success('登录成功');
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        }
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
       } else {
         message.error(response.data.message);
       }
