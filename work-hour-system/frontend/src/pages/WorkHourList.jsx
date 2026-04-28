@@ -124,11 +124,7 @@ const WorkHourList = () => {
       dataIndex: 'workType',
       key: 'workType',
       width: 100,
-      render: (text) => (
-        <span className={text === 'overtime' ? 'text-warning' : ''}>
-          {text === 'normal' ? '正常工时' : '加班'}
-        </span>
-      ),
+      render: (text) => (text === 'normal' ? '正常工时' : '加班'),
     },
     {
       title: '状态',
@@ -146,7 +142,7 @@ const WorkHourList = () => {
           <span
             style={{
               padding: '4px 12px',
-              borderRadius: 20,
+              borderRadius: 4,
               backgroundColor: status.color === 'green' ? '#f6ffed' : status.color === 'blue' ? '#e6f7ff' : '#f5f5f5',
               color: status.color === 'green' ? '#52c41a' : status.color === 'blue' ? '#1890ff' : '#666',
               fontSize: 12,
@@ -173,7 +169,7 @@ const WorkHourList = () => {
           {record.status === 'draft' && (
             <>
               <Button
-                type="link"
+                type="text"
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => handleEdit(record)}
@@ -181,7 +177,7 @@ const WorkHourList = () => {
                 编辑
               </Button>
               <Button
-                type="link"
+                type="text"
                 danger
                 size="small"
                 icon={<DeleteOutlined />}
@@ -201,7 +197,7 @@ const WorkHourList = () => {
           )}
           {record.status !== 'draft' && (
             <Button
-              type="link"
+              type="text"
               size="small"
               icon={<EyeOutlined />}
             >
@@ -216,19 +212,19 @@ const WorkHourList = () => {
   return (
     <Card
       style={{
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-        border: 'none',
+        borderRadius: 8,
+        border: '1px solid #f0f0f0',
+        boxShadow: 'none',
       }}
     >
-      <Row gutter={16} style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}>
+      <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
         <Col>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <SearchOutlined style={{ color: '#999' }} />
             <RangePicker
               value={dateRange}
               onChange={(dates) => setDateRange(dates)}
-              style={{ width: 320 }}
+              style={{ width: 280 }}
             />
           </div>
         </Col>
@@ -239,7 +235,7 @@ const WorkHourList = () => {
               placeholder="全部"
               value={statusFilter}
               onChange={setStatusFilter}
-              style={{ width: 140 }}
+              style={{ width: 120 }}
             >
               <Option value="">全部</Option>
               <Option value="draft">草稿</Option>

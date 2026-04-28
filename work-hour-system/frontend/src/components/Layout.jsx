@@ -79,26 +79,27 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
       <Sider
-        width={220}
+        width={200}
         style={{
-          background: '#0a1628',
+          background: '#fff',
           position: 'fixed',
           left: 0,
           top: 0,
           bottom: 0,
           zIndex: 100,
+          borderRight: '1px solid #f0f0f0',
         }}
       >
-        <div style={{ padding: '24px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, background: '#1890ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid #f0f0f0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, background: '#1890ff', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <ClockCircleOutlined style={{ fontSize: 18, color: '#fff' }} />
             </div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>工时填报系统</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>Work Hour System</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: '#1f1f1f' }}>工时填报系统</div>
+              <div style={{ fontSize: 10, color: '#999' }}>Work Hour System</div>
             </div>
           </div>
         </div>
@@ -109,20 +110,18 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
           onClick={({ key }) => onPageChange(key)}
           style={{
             borderRight: 'none',
-            marginTop: 16,
+            marginTop: 8,
             background: 'transparent',
           }}
-          theme="dark"
         >
           {(roleMenus[user?.role] || roleMenus.Employee).map((item) => (
             <Menu.Item
               key={item.key}
               icon={item.icon}
               style={{
-                margin: '4px 8px',
-                borderRadius: 8,
-                color: '#fff',
-                transition: 'all 0.3s',
+                margin: '2px 8px',
+                borderRadius: 6,
+                color: '#666',
               }}
             >
               <span>{item.label}</span>
@@ -131,7 +130,7 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
         </Menu>
       </Sider>
 
-      <Layout style={{ marginLeft: 220 }}>
+      <Layout style={{ marginLeft: 200 }}>
         <Header
           style={{
             display: 'flex',
@@ -139,26 +138,27 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
             alignItems: 'center',
             padding: '0 24px',
             background: '#fff',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
             position: 'fixed',
             right: 0,
-            left: 220,
+            left: 200,
             top: 0,
             zIndex: 99,
+            height: 56,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <HomeOutlined style={{ color: '#999' }} />
+            <HomeOutlined style={{ color: '#999', fontSize: 16 }} />
             <span style={{ color: '#999' }}>/</span>
             <span style={{ color: '#1890ff', fontWeight: 500 }}>{getPageTitle(currentPage)}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ textAlign: 'right', marginRight: 8 }}>
-              <div style={{ fontSize: 14, fontWeight: 500, color: '#333' }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: '#333' }}>
                 {user?.name}
               </div>
-              <div style={{ fontSize: 12, color: '#999' }}>
+              <div style={{ fontSize: 11, color: '#999' }}>
                 {user?.role === 'Admin' && '管理员'}
                 {user?.role === 'Director' && '高管'}
                 {user?.role === 'DeptManager' && '部门经理'}
@@ -176,9 +176,9 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 8,
-                  padding: '6px 12px',
-                  borderRadius: 20,
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 16,
                   background: '#f5f5f5',
                   cursor: 'pointer',
                   transition: 'all 0.3s',
@@ -190,7 +190,7 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
                   e.currentTarget.style.background = '#f5f5f5';
                 }}
               >
-                <Avatar size={28} icon={<UserOutlined />} />
+                <Avatar size={24} icon={<UserOutlined />} />
                 <MoreOutlined style={{ fontSize: 14, color: '#999' }} />
               </div>
             </Dropdown>
@@ -199,10 +199,10 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
 
         <Content
           style={{
-            padding: '24px',
-            background: '#f5f7fa',
+            padding: '20px',
+            background: '#f0f2f5',
             minHeight: '100vh',
-            marginTop: 64,
+            marginTop: 56,
           }}
         >
           {children}

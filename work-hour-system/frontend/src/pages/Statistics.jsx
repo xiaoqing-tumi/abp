@@ -53,10 +53,10 @@ const Statistics = () => {
     <div>
       <Card
         style={{
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-          border: 'none',
-          marginBottom: 20,
+          borderRadius: 8,
+          border: '1px solid #f0f0f0',
+          boxShadow: 'none',
+          marginBottom: 16,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -64,20 +64,20 @@ const Statistics = () => {
           <RangePicker
             value={dateRange}
             onChange={(dates) => setDateRange(dates)}
-            style={{ width: 320 }}
+            style={{ width: 280 }}
           />
         </div>
       </Card>
 
       <Card
         style={{
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-          border: 'none',
-          marginBottom: 20,
+          borderRadius: 8,
+          border: '1px solid #f0f0f0',
+          boxShadow: 'none',
+          marginBottom: 16,
         }}
       >
-        <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <UserOutlined style={{ color: '#1890ff' }} />
             <span style={{ fontWeight: 600, fontSize: 16 }}>个人工时统计</span>
@@ -88,9 +88,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -98,7 +98,7 @@ const Statistics = () => {
                 value={personalStats?.totalHours || 0}
                 suffix="小时"
                 prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
-                valueStyle={{ color: '#1890ff', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -106,9 +106,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -116,7 +116,7 @@ const Statistics = () => {
                 value={personalStats?.normalHours || 0}
                 suffix="小时"
                 prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
-                valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#52c41a', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -124,9 +124,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -134,7 +134,7 @@ const Statistics = () => {
                 value={personalStats?.overtimeHours || 0}
                 suffix="小时"
                 prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
-                valueStyle={{ color: '#fa8c16', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#fa8c16', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -142,9 +142,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -152,7 +152,7 @@ const Statistics = () => {
                 value={personalStats?.workDays || 0}
                 suffix="天"
                 prefix={<CalendarOutlined style={{ color: '#722ed1' }} />}
-                valueStyle={{ color: '#722ed1', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#722ed1', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -162,12 +162,12 @@ const Statistics = () => {
 
       <Card
         style={{
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-          border: 'none',
+          borderRadius: 8,
+          border: '1px solid #f0f0f0',
+          boxShadow: 'none',
         }}
       >
-        <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <TeamOutlined style={{ color: '#52c41a' }} />
             <span style={{ fontWeight: 600, fontSize: 16 }}>部门工时统计</span>
@@ -178,9 +178,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -188,7 +188,7 @@ const Statistics = () => {
                 value={deptStats?.totalHours || 0}
                 suffix="小时"
                 prefix={<LineChartOutlined style={{ color: '#1890ff' }} />}
-                valueStyle={{ color: '#1890ff', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -196,9 +196,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -206,7 +206,7 @@ const Statistics = () => {
                 value={deptStats?.normalHours || 0}
                 suffix="小时"
                 prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
-                valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#52c41a', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -214,9 +214,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -224,7 +224,7 @@ const Statistics = () => {
                 value={deptStats?.overtimeHours || 0}
                 suffix="小时"
                 prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
-                valueStyle={{ color: '#fa8c16', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#fa8c16', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>
@@ -232,9 +232,9 @@ const Statistics = () => {
           <Col span={6}>
             <Card
               style={{
-                borderRadius: 8,
-                border: 'none',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
               }}
             >
               <Statistic
@@ -242,7 +242,7 @@ const Statistics = () => {
                 value={deptStats?.employeeCount || 0}
                 suffix="人"
                 prefix={<TeamOutlined style={{ color: '#722ed1' }} />}
-                valueStyle={{ color: '#722ed1', fontSize: 28, fontWeight: 600 }}
+                valueStyle={{ color: '#722ed1', fontSize: 24, fontWeight: 600 }}
                 loading={loading}
               />
             </Card>

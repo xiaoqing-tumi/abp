@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, Select, Button, DatePicker, InputNumber, Card, Row, Col, message, Statistic } from 'antd';
-import { PlusOutlined, SaveOutlined, CalendarOutlined, ClockCircleOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, SaveOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI, basicDataAPI } from '../utils/api';
 
@@ -91,13 +91,13 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
 
   return (
     <div>
-      <Row gutter={16} style={{ marginBottom: 20 }}>
+      <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+              borderRadius: 8,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
             }}
           >
             <Statistic
@@ -105,16 +105,16 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
               value={todayHours}
               suffix="小时"
               prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
-              valueStyle={{ color: '#1890ff', fontSize: 28, fontWeight: 600 }}
+              valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+              borderRadius: 8,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
             }}
           >
             <Statistic
@@ -122,39 +122,39 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
               value={remainingHours}
               suffix="小时"
               prefix={<CalendarOutlined style={{ color: remainingHours > 0 ? '#52c41a' : '#ff4d4f' }} />}
-              valueStyle={{ color: remainingHours > 0 ? '#52c41a' : '#ff4d4f', fontSize: 28, fontWeight: 600 }}
+              valueStyle={{ color: remainingHours > 0 ? '#52c41a' : '#ff4d4f', fontSize: 24, fontWeight: 600 }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+              borderRadius: 8,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
             }}
           >
             <Statistic
               title="标准工时"
               value={maxHours}
               suffix="小时"
-              valueStyle={{ color: '#722ed1', fontSize: 28, fontWeight: 600 }}
+              valueStyle={{ color: '#722ed1', fontSize: 24, fontWeight: 600 }}
             />
           </Card>
         </Col>
         <Col span={6}>
           <Card
             style={{
-              borderRadius: 12,
-              border: 'none',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+              borderRadius: 8,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
             }}
           >
             <Statistic
               title="待审批OA流程"
               value={pendingProcesses.length}
               suffix="条"
-              valueStyle={{ color: '#faad14', fontSize: 28, fontWeight: 600 }}
+              valueStyle={{ color: '#faad14', fontSize: 24, fontWeight: 600 }}
             />
           </Card>
         </Col>
@@ -163,23 +163,19 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
       {lockedDate && (
         <Card
           style={{
-            marginBottom: 20,
-            borderRadius: 12,
-            border: '2px solid #faad14',
-            boxShadow: '0 4px 12px rgba(250, 173, 20, 0.1)',
+            marginBottom: 16,
+            borderRadius: 8,
+            border: '1px solid #faad14',
           }}
         >
-          <div style={{ padding: 16, background: '#fffbe6', borderRadius: 8 }}>
-            <p style={{ marginBottom: 8, fontWeight: 'bold', color: '#fa8c16' }}>
+          <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6 }}>
+            <p style={{ marginBottom: 6, fontWeight: 'bold', color: '#fa8c16' }}>
               ⚠️ 今日因{lockedDate.type === 'leave' ? '请假' : '出差'}申请审批中，工时已由系统自动生成
             </p>
-            <p style={{ color: '#d48806' }}>
+            <p style={{ color: '#d48806', fontSize: 13 }}>
               流程类型：{lockedDate.type === 'leave' ? '请假' : '出差'}
               {' | '}时长：{lockedDate.durationHours}小时
               {' | '}状态：待审批
-            </p>
-            <p style={{ marginTop: 8, color: '#fa8c16', fontSize: '12px' }}>
-              提示：您无法手动填报当日工时，待审批完成后由HR/部门经理统一调整
             </p>
           </div>
         </Card>
@@ -187,18 +183,15 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
 
       <Card
         style={{
-          borderRadius: 12,
-          border: 'none',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+          borderRadius: 8,
+          border: '1px solid #f0f0f0',
+          boxShadow: 'none',
         }}
       >
-        <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 4, height: 24, background: '#1890ff', borderRadius: 2 }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <PlusOutlined style={{ fontSize: 20, color: '#1890ff' }} />
-              <span style={{ fontSize: 18, fontWeight: 600 }}>填报工时</span>
-            </div>
+        <div style={{ marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #f0f0f0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <PlusOutlined style={{ fontSize: 18, color: '#1890ff' }} />
+            <span style={{ fontSize: 16, fontWeight: 600 }}>填报工时</span>
           </div>
         </div>
 
@@ -291,8 +284,8 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
           >
             <Input.TextArea
               placeholder="请简要描述今日工作内容..."
-              rows={4}
-              style={{ borderRadius: 8 }}
+              rows={3}
+              style={{ borderRadius: 6 }}
             />
           </Form.Item>
 
@@ -306,11 +299,11 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
               icon={<SaveOutlined />}
               disabled={!!lockedDate}
               style={{
-                height: 48,
-                fontSize: 16,
+                height: 40,
+                fontSize: 14,
                 fontWeight: 500,
                 background: '#1890ff',
-                borderRadius: 8,
+                borderRadius: 6,
               }}
             >
               {lockedDate ? '当日工时已被锁定' : '保存工时'}

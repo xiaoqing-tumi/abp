@@ -120,7 +120,7 @@ const ApprovalList = () => {
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
           <Button
-            type="link"
+            type="text"
             size="small"
             icon={<EyeOutlined />}
             onClick={() => handleView(record)}
@@ -151,12 +151,12 @@ const ApprovalList = () => {
   return (
     <Card
       style={{
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
-        border: 'none',
+        borderRadius: 8,
+        border: '1px solid #f0f0f0',
+        boxShadow: 'none',
       }}
     >
-      <Row gutter={16} style={{ marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <SearchOutlined style={{ color: '#999' }} />
           <span style={{ fontWeight: 600, fontSize: 16 }}>待审批列表</span>
