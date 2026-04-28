@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Card, message, Spin } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useAuth } from '../stores/authStore';
 import { authAPI } from '../utils/api';
 
 const { Option } = Select;
 
-const Login = ({ onLoginSuccess }) => {
-  const { login, loading } = useAuth();
+const Login = ({ onLoginSuccess, onLogin }) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -27,14 +26,24 @@ const Login = ({ onLoginSuccess }) => {
       return;
     }
 
-    const result = await login(personCode);
-    if (result.success) {
-      message.success(result.message);
-      if (onLoginSuccess) {
-        onLoginSuccess();
+    setLoading(true);
+    try {
+      const response = await authAPI.login(personCode);
+      if (response.data.code === 200) {
+        const data = response.data.data;
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data));
+        message.success('登录成功');
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
+      } else {
+        message.error(response.data.message);
       }
-    } else {
-      message.error(result.message);
+    } catch (error) {
+      message.error(error.response?.data?.message || '登录失败');
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -11,18 +11,34 @@ import { useAuth } from './stores/authStore';
 import './App.css';
 
 function App() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, login } = useAuth();
   const [currentPage, setCurrentPage] = useState('workhour');
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = '/login';
+    const pathname = window.location.pathname;
+    
+    if (!token && pathname !== '/login') {
+      setShowLogin(true);
+    } else if (token && pathname === '/login') {
+      window.history.replaceState({}, document.title, '/');
+      setShowLogin(false);
+    } else if (!token && pathname === '/login') {
+      setShowLogin(true);
     }
   }, []);
 
   const handleLoginSuccess = () => {
-    window.location.href = '/';
+    setShowLogin(false);
+    window.history.replaceState({}, document.title, '/');
+  };
+
+  const handleLogin = async (personCode) => {
+    const result = await login(personCode);
+    if (result.success) {
+      handleLoginSuccess();
+    }
   };
 
   const renderContent = () => {
@@ -40,10 +56,10 @@ function App() {
     }
   };
 
-  if (!isLoggedIn()) {
+  if (showLogin || !isLoggedIn()) {
     return (
       <ConfigProvider locale={zhCN}>
-        <Login onLoginSuccess={handleLoginSuccess} />
+        <Login onLoginSuccess={handleLoginSuccess} onLogin={handleLogin} />
       </ConfigProvider>
     );
   }
