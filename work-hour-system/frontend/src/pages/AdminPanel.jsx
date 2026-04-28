@@ -275,6 +275,7 @@ const AdminPanel = () => {
             showSizeChanger: true,
             showTotal: (total) => `共 ${total} 条记录`,
           }}
+          scroll={{ x: 'max-content' }}
         />
       )}
 
@@ -290,6 +291,7 @@ const AdminPanel = () => {
             showSizeChanger: true,
             showTotal: (total) => `共 ${total} 条记录`,
           }}
+          scroll={{ x: 'max-content' }}
         />
       )}
 

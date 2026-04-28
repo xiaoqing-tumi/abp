@@ -257,6 +257,7 @@ const WorkHourList = () => {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 条记录`,
         }}
+        scroll={{ x: 'max-content' }}
         style={{ background: '#fff' }}
       />
 
