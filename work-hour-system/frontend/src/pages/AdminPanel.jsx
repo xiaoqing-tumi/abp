@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Card, Row, Col, message, Modal, Form, Input, Select } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, UsersOutlined, FolderOpenOutlined, RefreshCwOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, UserOutlined, FolderOpenOutlined, ReloadOutlined, TeamOutlined } from '@ant-design/icons';
 import { basicDataAPI, workHourAPI } from '../utils/api';
 
 const { Option } = Select;
@@ -242,7 +242,7 @@ const AdminPanel = () => {
           <Button
             type={activeTab === 'users' ? 'primary' : 'default'}
             onClick={() => setActiveTab('users')}
-            icon={<UsersOutlined />}
+            icon={<TeamOutlined />}
           >
             用户管理
           </Button>
@@ -256,7 +256,7 @@ const AdminPanel = () => {
         </div>
         <Button
           type="default"
-          icon={<RefreshCwOutlined />}
+          icon={<ReloadOutlined />}
           onClick={handleSyncData}
         >
           同步数据

@@ -9,6 +9,7 @@ import {
   UserOutlined,
   MoreOutlined,
   HomeOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../stores/authStore';
 
@@ -43,7 +44,7 @@ const roleMenus = {
     { key: 'history', label: '工时历史', icon: <FileTextOutlined /> },
     { key: 'approval', label: '工时审批', icon: <CheckSquareOutlined /> },
     { key: 'statistics', label: '统计分析', icon: <BarChartOutlined /> },
-    { key: 'admin', label: '系统管理', icon: <SettingsOutlined /> },
+    { key: 'admin', label: '系统管理', icon: <SettingOutlined /> },
   ],
   Director: [
     { key: 'workhour', label: '工时填报', icon: <ClockCircleOutlined /> },
