@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Card, Row, Col, message, Modal } from 'antd';
-import { CheckOutlined, CloseOutlined, EyeOutlined } from '@ant-design/icons';
+import { CheckOutlined, CloseOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -120,7 +120,7 @@ const ApprovalList = () => {
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
           <Button
-            ghost
+            type="link"
             size="small"
             icon={<EyeOutlined />}
             onClick={() => handleView(record)}
@@ -150,17 +150,22 @@ const ApprovalList = () => {
 
   return (
     <Card
-      title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 4, height: 24, background: 'linear-gradient(180deg, #52c41a 0%, #389e0d 100%)', borderRadius: 2 }} />
-          <span style={{ fontSize: 18, fontWeight: 600 }}>审批管理</span>
-          <span style={{ marginLeft: 'auto', color: '#999', fontSize: 14 }}>
-            待审批: {data.length} 条
-          </span>
-        </div>
-      }
-      style={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}
+      style={{
+        borderRadius: 12,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+        border: 'none',
+      }}
     >
+      <Row gutter={16} style={{ marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <SearchOutlined style={{ color: '#999' }} />
+          <span style={{ fontWeight: 600, fontSize: 16 }}>待审批列表</span>
+        </div>
+        <div style={{ color: '#faad14', fontWeight: 500 }}>
+          待审批: {data.length} 条
+        </div>
+      </Row>
+
       <Table
         columns={columns}
         dataSource={data}
@@ -186,49 +191,49 @@ const ApprovalList = () => {
           <div style={{ padding: 16 }}>
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>提交人</div>
-                <div style={{ marginTop: 4, fontSize: 16 }}>{selectedItem.personName}</div>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>提交人</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.personName}</div>
               </Col>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>部门</div>
-                <div style={{ marginTop: 4, fontSize: 16 }}>{selectedItem.departmentName}</div>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>部门</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.departmentName}</div>
               </Col>
             </Row>
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>工作日期</div>
-                <div style={{ marginTop: 4, fontSize: 16 }}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作日期</div>
+                <div style={{ fontSize: 16 }}>
                   {dayjs(selectedItem.workDate).format('YYYY-MM-DD')}
                 </div>
               </Col>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>工时</div>
-                <div style={{ marginTop: 4, fontSize: 16, color: '#1890ff' }}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工时</div>
+                <div style={{ fontSize: 16, color: '#1890ff' }}>
                   {selectedItem.hours} 小时
                 </div>
               </Col>
             </Row>
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>项目</div>
-                <div style={{ marginTop: 4, fontSize: 16 }}>{selectedItem.projectName}</div>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>项目</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.projectName}</div>
               </Col>
               <Col span={12}>
-                <div style={{ fontWeight: 500, color: '#666' }}>工作类型</div>
-                <div style={{ marginTop: 4, fontSize: 16 }}>
+                <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作类型</div>
+                <div style={{ fontSize: 16 }}>
                   {selectedItem.workType === 'normal' ? '正常工时' : '加班'}
                 </div>
               </Col>
             </Row>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontWeight: 500, color: '#666' }}>工作描述</div>
-              <div style={{ marginTop: 4, fontSize: 16, lineHeight: 1.6 }}>
+              <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作描述</div>
+              <div style={{ fontSize: 16, lineHeight: 1.6 }}>
                 {selectedItem.description || '-'}
               </div>
             </div>
             <div style={{ paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
-              <div style={{ fontWeight: 500, color: '#666' }}>提交时间</div>
-              <div style={{ marginTop: 4, fontSize: 14, color: '#999' }}>
+              <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>提交时间</div>
+              <div style={{ fontSize: 14, color: '#999' }}>
                 {dayjs(selectedItem.submitTime).format('YYYY-MM-DD HH:mm:ss')}
               </div>
             </div>

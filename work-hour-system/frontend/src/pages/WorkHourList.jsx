@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -131,25 +131,27 @@ const WorkHourList = () => {
       ),
     },
     {
-      title: '描述',
-      dataIndex: 'description',
-      key: 'description',
-      ellipsis: true,
-    },
-    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
       render: (text) => {
         const statusMap = {
-          draft: { label: '草稿', color: 'default' },
-          submitted: { label: '已提交', color: 'processing' },
-          approved: { label: '已审批', color: 'success' },
+          draft: { label: '草稿', color: 'gray' },
+          submitted: { label: '已提交', color: 'blue' },
+          approved: { label: '已审批', color: 'green' },
         };
-        const status = statusMap[text] || { label: text, color: 'default' };
+        const status = statusMap[text] || { label: text, color: 'gray' };
         return (
-          <span className={`ant-tag ant-tag-${status.color}`}>
+          <span
+            style={{
+              padding: '4px 12px',
+              borderRadius: 20,
+              backgroundColor: status.color === 'green' ? '#f6ffed' : status.color === 'blue' ? '#e6f7ff' : '#f5f5f5',
+              color: status.color === 'green' ? '#52c41a' : status.color === 'blue' ? '#1890ff' : '#666',
+              fontSize: 12,
+            }}
+          >
             {status.label}
           </span>
         );
@@ -171,8 +173,7 @@ const WorkHourList = () => {
           {record.status === 'draft' && (
             <>
               <Button
-                type="primary"
-                ghost
+                type="link"
                 size="small"
                 icon={<EditOutlined />}
                 onClick={() => handleEdit(record)}
@@ -180,8 +181,8 @@ const WorkHourList = () => {
                 编辑
               </Button>
               <Button
+                type="link"
                 danger
-                ghost
                 size="small"
                 icon={<DeleteOutlined />}
                 onClick={() => handleDelete(record.id)}
@@ -200,7 +201,7 @@ const WorkHourList = () => {
           )}
           {record.status !== 'draft' && (
             <Button
-              ghost
+              type="link"
               size="small"
               icon={<EyeOutlined />}
             >
@@ -214,33 +215,38 @@ const WorkHourList = () => {
 
   return (
     <Card
-      title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 4, height: 24, background: 'linear-gradient(180deg, #1890ff 0%, #096dd9 100%)', borderRadius: 2 }} />
-          <span style={{ fontSize: 18, fontWeight: 600 }}>工时历史</span>
-        </div>
-      }
-      style={{ boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}
+      style={{
+        borderRadius: 12,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+        border: 'none',
+      }}
     >
-      <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center' }}>
+      <Row gutter={16} style={{ marginBottom: 20, display: 'flex', alignItems: 'center' }}>
         <Col>
-          <RangePicker
-            value={dateRange}
-            onChange={(dates) => setDateRange(dates)}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <SearchOutlined style={{ color: '#999' }} />
+            <RangePicker
+              value={dateRange}
+              onChange={(dates) => setDateRange(dates)}
+              style={{ width: 320 }}
+            />
+          </div>
         </Col>
         <Col>
-          <Select
-            placeholder="状态筛选"
-            value={statusFilter}
-            onChange={setStatusFilter}
-            style={{ width: 160 }}
-          >
-            <Option value="">全部</Option>
-            <Option value="draft">草稿</Option>
-            <Option value="submitted">已提交</Option>
-            <Option value="approved">已审批</Option>
-          </Select>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FilterOutlined style={{ color: '#999' }} />
+            <Select
+              placeholder="全部"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 140 }}
+            >
+              <Option value="">全部</Option>
+              <Option value="draft">草稿</Option>
+              <Option value="submitted">已提交</Option>
+              <Option value="approved">已审批</Option>
+            </Select>
+          </div>
         </Col>
       </Row>
 

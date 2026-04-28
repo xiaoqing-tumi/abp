@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, DatePicker, Row, Col, Statistic, message } from 'antd';
-import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, LineChartOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
+import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, LineChartOutlined, TeamOutlined, CalendarOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { statisticsAPI, basicDataAPI } from '../utils/api';
 
@@ -52,33 +52,47 @@ const Statistics = () => {
   return (
     <div>
       <Card
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 4, height: 24, background: 'linear-gradient(180deg, #722ed1 0%, #531dab 100%)', borderRadius: 2 }} />
-            <span style={{ fontSize: 18, fontWeight: 600 }}>统计分析</span>
-          </div>
-        }
-        style={{ marginBottom: 20, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}
+        style={{
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+          border: 'none',
+          marginBottom: 20,
+        }}
       >
-        <RangePicker
-          value={dateRange}
-          onChange={(dates) => setDateRange(dates)}
-          style={{ width: 320 }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <SearchOutlined style={{ color: '#999' }} />
+          <RangePicker
+            value={dateRange}
+            onChange={(dates) => setDateRange(dates)}
+            style={{ width: 320 }}
+          />
+        </div>
       </Card>
 
       <Card
-        title={
+        style={{
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+          border: 'none',
+          marginBottom: 20,
+        }}
+      >
+        <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <UserOutlined style={{ color: '#1890ff' }} />
-            <span style={{ fontWeight: 600 }}>个人工时统计</span>
+            <span style={{ fontWeight: 600, fontSize: 16 }}>个人工时统计</span>
           </div>
-        }
-        style={{ marginBottom: 20, boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
-      >
+        </div>
+
         <Row gutter={16}>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="总工时"
                 value={personalStats?.totalHours || 0}
@@ -90,7 +104,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="正常工时"
                 value={personalStats?.normalHours || 0}
@@ -102,7 +122,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="加班工时"
                 value={personalStats?.overtimeHours || 0}
@@ -114,7 +140,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="工作天数"
                 value={personalStats?.workDays || 0}
@@ -129,17 +161,28 @@ const Statistics = () => {
       </Card>
 
       <Card
-        title={
+        style={{
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)',
+          border: 'none',
+        }}
+      >
+        <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #f0f0f0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <TeamOutlined style={{ color: '#52c41a' }} />
-            <span style={{ fontWeight: 600 }}>部门工时统计</span>
+            <span style={{ fontWeight: 600, fontSize: 16 }}>部门工时统计</span>
           </div>
-        }
-        style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
-      >
+        </div>
+
         <Row gutter={16}>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="部门总工时"
                 value={deptStats?.totalHours || 0}
@@ -151,7 +194,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="正常工时"
                 value={deptStats?.normalHours || 0}
@@ -163,7 +212,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="加班工时"
                 value={deptStats?.overtimeHours || 0}
@@ -175,7 +230,13 @@ const Statistics = () => {
             </Card>
           </Col>
           <Col span={6}>
-            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Card
+              style={{
+                borderRadius: 8,
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+              }}
+            >
               <Statistic
                 title="部门人数"
                 value={deptStats?.employeeCount || 0}
