@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, DatePicker, Row, Col, Statistic, message } from 'antd';
-import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined } from '@ant-design/icons';
+import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, LineChartOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { statisticsAPI, basicDataAPI } from '../utils/api';
 
@@ -51,98 +51,143 @@ const Statistics = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 4, height: 24, background: 'linear-gradient(180deg, #722ed1 0%, #531dab 100%)', borderRadius: 2 }} />
+            <span style={{ fontSize: 18, fontWeight: 600 }}>统计分析</span>
+          </div>
+        }
+        style={{ marginBottom: 20, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)' }}
+      >
         <RangePicker
           value={dateRange}
           onChange={(dates) => setDateRange(dates)}
+          style={{ width: 320 }}
         />
-      </div>
+      </Card>
 
-      <Row gutter={16}>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="个人总工时"
-              value={personalStats?.totalHours || 0}
-              suffix="小时"
-              prefix={<ClockCircleOutlined />}
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="正常工时"
-              value={personalStats?.normalHours || 0}
-              suffix="小时"
-              prefix={<BarChartOutlined />}
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="加班工时"
-              value={personalStats?.overtimeHours || 0}
-              suffix="小时"
-              prefix={<ArrowUpOutlined />}
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="工作天数"
-              value={personalStats?.workDays || 0}
-              suffix="天"
-              prefix={<UserOutlined />}
-              loading={loading}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <UserOutlined style={{ color: '#1890ff' }} />
+            <span style={{ fontWeight: 600 }}>个人工时统计</span>
+          </div>
+        }
+        style={{ marginBottom: 20, boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
+      >
+        <Row gutter={16}>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="总工时"
+                value={personalStats?.totalHours || 0}
+                suffix="小时"
+                prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
+                valueStyle={{ color: '#1890ff', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="正常工时"
+                value={personalStats?.normalHours || 0}
+                suffix="小时"
+                prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
+                valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="加班工时"
+                value={personalStats?.overtimeHours || 0}
+                suffix="小时"
+                prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
+                valueStyle={{ color: '#fa8c16', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="工作天数"
+                value={personalStats?.workDays || 0}
+                suffix="天"
+                prefix={<CalendarOutlined style={{ color: '#722ed1' }} />}
+                valueStyle={{ color: '#722ed1', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+        </Row>
+      </Card>
 
-      <Row gutter={16} style={{ marginTop: 16 }}>
-        <Col span={6}>
-          <Card title="部门总工时">
-            <Statistic
-              value={deptStats?.totalHours || 0}
-              suffix="小时"
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card title="部门正常工时">
-            <Statistic
-              value={deptStats?.normalHours || 0}
-              suffix="小时"
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card title="部门加班工时">
-            <Statistic
-              value={deptStats?.overtimeHours || 0}
-              suffix="小时"
-              loading={loading}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card title="部门人数">
-            <Statistic
-              value={deptStats?.employeeCount || 0}
-              suffix="人"
-              loading={loading}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <TeamOutlined style={{ color: '#52c41a' }} />
+            <span style={{ fontWeight: 600 }}>部门工时统计</span>
+          </div>
+        }
+        style={{ boxShadow: '0 4px 12px rgba(0, 0, 0, 0.06)' }}
+      >
+        <Row gutter={16}>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="部门总工时"
+                value={deptStats?.totalHours || 0}
+                suffix="小时"
+                prefix={<LineChartOutlined style={{ color: '#1890ff' }} />}
+                valueStyle={{ color: '#1890ff', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="正常工时"
+                value={deptStats?.normalHours || 0}
+                suffix="小时"
+                prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
+                valueStyle={{ color: '#52c41a', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="加班工时"
+                value={deptStats?.overtimeHours || 0}
+                suffix="小时"
+                prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
+                valueStyle={{ color: '#fa8c16', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card hoverable style={{ border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <Statistic
+                title="部门人数"
+                value={deptStats?.employeeCount || 0}
+                suffix="人"
+                prefix={<TeamOutlined style={{ color: '#722ed1' }} />}
+                valueStyle={{ color: '#722ed1', fontSize: 28, fontWeight: 600 }}
+                loading={loading}
+              />
+            </Card>
+          </Col>
+        </Row>
+      </Card>
     </div>
   );
 };
