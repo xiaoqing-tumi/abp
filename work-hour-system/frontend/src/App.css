@@ -1,0 +1,15 @@
+#root {
+  min-height: 100vh;
+}
+
+.ant-layout-header {
+  padding: 0 24px;
+}
+
+.ant-menu-item {
+  margin: 4px 0 !important;
+}
+
+.ant-statistic-content {
+  font-size: 28px;
+}
