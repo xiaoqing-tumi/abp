@@ -238,7 +238,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
               >
                 <DatePicker
                   disabledDate={(current) => {
-                    return current && (current > dayjs() || current < dayjs().subtract(1, 'day'));
+                    return current && current > dayjs();
                   }}
                   style={{ width: '100%' }}
                   placeholder="选择日期"

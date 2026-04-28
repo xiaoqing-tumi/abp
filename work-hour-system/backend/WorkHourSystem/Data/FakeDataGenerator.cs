@@ -154,13 +154,14 @@ public static class FakeDataGenerator
     {
         var today = DateTime.Today;
         var employees = store.Persons.Where(p => p.Status == 1).ToList();
+        var descriptions = new[] { "需求分析", "代码开发", "Bug修复", "代码审查", "会议讨论", "文档编写", "测试验证", "线上问题处理", "技术调研", "项目复盘" };
         
         foreach (var person in employees)
         {
             var projects = store.ProjectMembers.Where(pm => pm.PersonCode == person.PersonCode)
                                               .Select(pm => pm.ProjectCode).ToList();
             
-            for (int i = 5; i >= 0; i--)
+            for (int i = 14; i >= 0; i--)
             {
                 var date = today.AddDays(-i);
                 var hasOaPending = store.OaProcessSnapshots.Any(op => 
@@ -168,17 +169,20 @@ public static class FakeDataGenerator
                     op.ProcessDate.Date == date.Date && 
                     op.Status == "pending");
                 
-                if (!hasOaPending && projects.Any())
+                if (!hasOaPending && projects.Any() && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
                 {
                     var hoursFilled = 0m;
-                    var projectCount = Random.Next(1, 3);
+                    var projectCount = Random.Next(1, 4);
                     
                     foreach (var projectCode in projects.OrderBy(_ => Random.Next()).Take(projectCount))
                     {
                         if (hoursFilled >= 8) break;
                         
-                        var hours = Math.Min((decimal)(Random.Next(4, 9) * 0.5), 8 - hoursFilled);
+                        var hours = Math.Min((decimal)(Random.Next(2, 9) * 0.5), 8 - hoursFilled);
                         hoursFilled += hours;
+                        
+                        var isToday = i == 0;
+                        var isYesterday = i == 1;
                         
                         store.WorkHours.Add(new WorkHour
                         {
@@ -187,11 +191,11 @@ public static class FakeDataGenerator
                             ProjectCode = projectCode,
                             WorkDate = date,
                             Hours = hours,
-                            Description = $"项目开发工作",
-                            WorkType = i == 0 ? "draft" : (Random.Next(10) < 2 ? "overtime" : "normal"),
+                            Description = descriptions[Random.Next(descriptions.Length)],
+                            WorkType = Random.Next(10) < 3 ? "overtime" : "normal",
                             Source = "manual",
-                            Status = i == 0 ? "draft" : (Random.Next(10) < 3 ? "submitted" : "approved"),
-                            SubmitTime = i == 0 ? DateTime.MinValue : DateTime.Now.AddDays(-i).AddHours(Random.Next(17, 20))
+                            Status = isToday ? "draft" : (isYesterday ? (Random.Next(10) < 5 ? "draft" : "submitted") : (Random.Next(10) < 2 ? "submitted" : "approved")),
+                            SubmitTime = !isToday ? DateTime.Now.AddDays(-i).AddHours(Random.Next(17, 21)) : DateTime.MinValue
                         });
                     }
                 }
