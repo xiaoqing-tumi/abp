@@ -52,6 +52,16 @@ const WorkHourList = () => {
     setIsModalVisible(true);
   };
 
+  const handleView = (record) => {
+    setEditingItem(record);
+    form.setFieldsValue({
+      hours: record.hours,
+      description: record.description,
+      workType: record.workType,
+    });
+    setIsModalVisible(true);
+  };
+
   const handleDelete = async (id) => {
     try {
       const response = await workHourAPI.deleteWorkHour(id);
@@ -200,6 +210,7 @@ const WorkHourList = () => {
               type="text"
               size="small"
               icon={<EyeOutlined />}
+              onClick={() => handleView(record)}
             >
               查看
             </Button>

@@ -78,6 +78,17 @@ const AdminPanel = () => {
     setIsModalVisible(true);
   };
 
+  const handleView = (record) => {
+    setEditingItem(record);
+    form.setFieldsValue({
+      name: record.name,
+      departmentId: record.departmentId,
+      role: record.role,
+      status: record.status,
+    });
+    setIsModalVisible(true);
+  };
+
   const handleDelete = async (personCode) => {
     try {
       message.success('删除成功');
@@ -152,6 +163,7 @@ const AdminPanel = () => {
             type="text"
             size="small"
             icon={<EyeOutlined />}
+            onClick={() => handleView(record)}
           >
             查看
           </Button>
