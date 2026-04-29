@@ -154,48 +154,95 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
             <span style={{ color: '#1890ff', fontWeight: 500 }}>{getPageTitle(currentPage)}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ textAlign: 'right', marginRight: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: '#333' }}>
-                {user?.name}
-              </div>
-              <div style={{ fontSize: 11, color: '#999' }}>
-                {user?.role === 'Admin' && '管理员'}
-                {user?.role === 'Director' && '高管'}
-                {user?.role === 'DeptManager' && '部门经理'}
-                {user?.role === 'PM' && '项目经理'}
-                {user?.role === 'HRAttendance' && 'HR专员'}
-                {user?.role === 'Employee' && '普通员工'}
-              </div>
-            </div>
-
-            <Dropdown
-              menu={{ items: userMenuItems }}
-              placement="bottomRight"
+          <Dropdown
+            menu={{ 
+              items: [
+                {
+                  key: 'profile',
+                  icon: <UserOutlined />,
+                  label: (
+                    <div style={{ padding: '8px 12px' }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#1f1f1f', marginBottom: 4 }}>
+                        {user?.name}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>
+                        {user?.role === 'Admin' && '管理员'}
+                        {user?.role === 'Director' && '高管'}
+                        {user?.role === 'DeptManager' && '部门经理'}
+                        {user?.role === 'PM' && '项目经理'}
+                        {user?.role === 'HRAttendance' && 'HR专员'}
+                        {user?.role === 'Employee' && '普通员工'}
+                      </div>
+                      <div style={{ fontSize: 11, color: '#bfbfbf', marginTop: 4 }}>
+                        {user?.email}
+                      </div>
+                    </div>
+                  ),
+                  onClick: () => {},
+                },
+                { type: 'divider' },
+                {
+                  key: 'logout',
+                  icon: <LogoutOutlined />,
+                  label: '退出登录',
+                  onClick: () => {
+                    logout();
+                    window.location.href = '/login';
+                  },
+                },
+              ]
+            }}
+            placement="bottomRight"
+            overlayStyle={{
+              width: 280,
+              borderRadius: 12,
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
+              border: 'none',
+              padding: 0,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '6px 12px',
+                borderRadius: 20,
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#f0f5ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+              }}
             >
-              <div
+              <Avatar 
+                size={32} 
+                icon={<UserOutlined style={{ fontSize: 16 }} />}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '4px 10px',
-                  borderRadius: 16,
-                  background: '#f5f5f5',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: '2px solid #fff',
+                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#e8e8e8';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = '#f5f5f5';
-                }}
-              >
-                <Avatar size={24} icon={<UserOutlined />} />
-                <MoreOutlined style={{ fontSize: 14, color: '#999' }} />
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#262626' }}>
+                  {user?.name}
+                </div>
+                <div style={{ fontSize: 12, color: '#8c8c8c' }}>
+                  {user?.role === 'Admin' && '管理员'}
+                  {user?.role === 'Director' && '高管'}
+                  {user?.role === 'DeptManager' && '部门经理'}
+                  {user?.role === 'PM' && '项目经理'}
+                  {user?.role === 'HRAttendance' && 'HR专员'}
+                  {user?.role === 'Employee' && '普通员工'}
+                </div>
               </div>
-            </Dropdown>
-          </div>
+              <MoreOutlined style={{ fontSize: 14, color: '#bfbfbf' }} />
+            </div>
+          </Dropdown>
         </Header>
 
         <Content
