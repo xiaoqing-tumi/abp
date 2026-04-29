@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined, RotateCcwOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -253,7 +253,7 @@ const WorkHourList = () => {
                 <Button
                   type="primary"
                   size="small"
-                  icon={<RotateCcwOutlined />}
+                  icon={<SyncOutlined />}
                   onClick={() => handleResubmit(record.id)}
                 >
                   重新提交
