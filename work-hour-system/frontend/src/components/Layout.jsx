@@ -10,6 +10,7 @@ import {
   MoreOutlined,
   HomeOutlined,
   SettingOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../stores/authStore';
 
@@ -45,6 +46,7 @@ const roleMenus = {
     { key: 'approval', label: '工时审批', icon: <CheckSquareOutlined /> },
     { key: 'statistics', label: '统计分析', icon: <BarChartOutlined /> },
     { key: 'admin', label: '系统管理', icon: <SettingOutlined /> },
+    { key: 'sync', label: '数据同步', icon: <SyncOutlined /> },
   ],
   Director: [
     { key: 'workhour', label: '工时填报', icon: <ClockCircleOutlined /> },
@@ -61,6 +63,7 @@ const getPageTitle = (page) => {
     approval: '审批管理',
     statistics: '统计分析',
     admin: '系统管理',
+    sync: '数据同步',
   };
   return titles[page] || '工时填报';
 };
@@ -80,6 +83,12 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
       },
     },
   ];
+
+  const menuItems = (roleMenus[user?.role] || roleMenus.Employee).map((item) => ({
+    key: item.key,
+    icon: item.icon,
+    label: item.label,
+  }));
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
@@ -111,26 +120,13 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
           mode="inline"
           selectedKeys={[currentPage]}
           onClick={({ key }) => onPageChange(key)}
+          items={menuItems}
           style={{
             borderRight: 'none',
             marginTop: 8,
             background: 'transparent',
           }}
-        >
-          {(roleMenus[user?.role] || roleMenus.Employee).map((item) => (
-            <Menu.Item
-              key={item.key}
-              icon={item.icon}
-              style={{
-                margin: '2px 8px',
-                borderRadius: 6,
-                color: '#666',
-              }}
-            >
-              <span>{item.label}</span>
-            </Menu.Item>
-          ))}
-        </Menu>
+        />
       </Sider>
 
       <Layout style={{ marginLeft: 200 }}>

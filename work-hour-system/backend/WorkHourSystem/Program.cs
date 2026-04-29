@@ -21,6 +21,8 @@ builder.Services.AddSingleton<IPermissionService, PermissionService>();
 builder.Services.AddSingleton<IWorkHourService, WorkHourService>();
 builder.Services.AddSingleton<IBasicDataService, BasicDataService>();
 
+builder.Services.AddHostedService<DataSyncHostedService>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

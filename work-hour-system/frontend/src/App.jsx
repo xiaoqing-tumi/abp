@@ -7,6 +7,7 @@ import WorkHourList from './pages/WorkHourList';
 import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
 import AdminPanel from './pages/AdminPanel';
+import DataSync from './pages/DataSync';
 import CustomLayout from './components/Layout';
 import { useAuth } from './stores/authStore';
 import './App.css';
@@ -45,6 +46,8 @@ function App() {
         return <Statistics />;
       case 'admin':
         return <AdminPanel />;
+      case 'sync':
+        return <DataSync />;
       default:
         return <WorkHourForm workDate={new Date()} onSubmit={() => {}} />;
     }
