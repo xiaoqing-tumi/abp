@@ -13,6 +13,14 @@ const ApprovalList = () => {
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setCurrentUser(JSON.parse(userStr));
+    }
+  }, []);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -262,7 +270,7 @@ const ApprovalList = () => {
             >
               详情
             </Button>
-            {record.status === 'Submitted' && (
+            {record.status === 'Submitted' && currentUser?.role !== 'Admin' && (
               <>
                 <Button
                   type="primary"
