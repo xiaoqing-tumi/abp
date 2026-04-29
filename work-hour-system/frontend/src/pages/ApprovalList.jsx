@@ -8,7 +8,8 @@ const { Option } = Select;
 const { TextArea } = Modal;
 
 const ApprovalList = () => {
-  const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -33,20 +34,24 @@ const ApprovalList = () => {
 
   useEffect(() => {
     fetchWorkHours();
-  }, [statusFilter]);
+  }, []);
+
+  useEffect(() => {
+    if (statusFilter === 'all') {
+      setFilteredData(allData);
+    } else {
+      const filtered = allData.filter(item => item.status === statusFilter);
+      setFilteredData(filtered);
+    }
+  }, [statusFilter, allData]);
 
   const fetchWorkHours = async () => {
     setLoading(true);
     try {
-      let response;
-      if (statusFilter === 'Submitted') {
-        response = await workHourAPI.getPendingApprovals();
-      } else {
-        const params = statusFilter === 'all' ? {} : { status: statusFilter };
-        response = await workHourAPI.getWorkHours(params);
-      }
+      const response = await workHourAPI.getWorkHours({});
       if (response.data.code === 200) {
-        setData(response.data.data);
+        setAllData(response.data.data);
+        setFilteredData(response.data.data);
       }
     } catch (error) {
       message.error('加载失败');
@@ -304,12 +309,12 @@ const ApprovalList = () => {
   }));
 
   const stats = useMemo(() => {
-    const submitted = data.filter(item => item.status === 'Submitted').length;
-    const approved = data.filter(item => item.status === 'Approved').length;
-    const rejected = data.filter(item => item.status === 'Rejected').length;
-    const pending = data.filter(item => item.status === 'Pending').length;
-    return { submitted, approved, rejected, pending, total: data.length };
-  }, [data]);
+    const submitted = allData.filter(item => item.status === 'Submitted').length;
+    const approved = allData.filter(item => item.status === 'Approved').length;
+    const rejected = allData.filter(item => item.status === 'Rejected').length;
+    const pending = allData.filter(item => item.status === 'Pending').length;
+    return { submitted, approved, rejected, pending, total: allData.length };
+  }, [allData]);
 
   return (
     <Card
@@ -444,7 +449,7 @@ const ApprovalList = () => {
 
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={filteredData}
         rowKey="id"
         loading={loading}
         bordered={false}
