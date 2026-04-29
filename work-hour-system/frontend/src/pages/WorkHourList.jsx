@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined, RotateCcwOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -57,8 +57,8 @@ const WorkHourList = () => {
   };
 
   const handleEdit = (record) => {
-    if (record.status !== 'Pending') {
-      message.warning('只能编辑待提交状态的工时记录');
+    if (record.status !== 'Pending' && record.status !== 'Rejected') {
+      message.warning('只能编辑待提交或已驳回状态的工时记录');
       return;
     }
     setEditingItem(record);
@@ -106,14 +106,29 @@ const WorkHourList = () => {
     }
   };
 
+  const handleResubmit = async (id) => {
+    try {
+      const response = await workHourAPI.updateWorkHour(id, { status: 'Pending' });
+      if (response.data.code === 200) {
+        message.success('已转为待提交状态，可以重新编辑并提交');
+        fetchWorkHours();
+      } else {
+        message.error(response.data.message);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || '操作失败');
+    }
+  };
+
   const handleSaveEdit = async (values) => {
     try {
       const response = await workHourAPI.updateWorkHour(editingItem.id, {
         workHours: values.workHours,
         workContent: values.workContent,
+        status: 'Pending',
       });
       if (response.data.code === 200) {
-        message.success('修改成功');
+        message.success('修改成功，已转为待提交状态');
         setIsModalVisible(false);
         fetchWorkHours();
       } else {
@@ -193,7 +208,7 @@ const WorkHourList = () => {
       result.push({
         title: '操作',
         key: 'actions',
-        width: 200,
+        width: 250,
         render: (_, record) => (
           <div style={{ display: 'flex', gap: 8 }}>
             {record.status === 'Pending' && (
@@ -225,7 +240,27 @@ const WorkHourList = () => {
                 </Button>
               </>
             )}
-            {record.status !== 'Pending' && (
+            {record.status === 'Rejected' && (
+              <>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEdit(record)}
+                >
+                  重新编辑
+                </Button>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<RotateCcwOutlined />}
+                  onClick={() => handleResubmit(record.id)}
+                >
+                  重新提交
+                </Button>
+              </>
+            )}
+            {(record.status === 'Submitted' || record.status === 'Approved') && (
               <Button
                 type="text"
                 size="small"
@@ -318,10 +353,10 @@ const WorkHourList = () => {
       />
 
       <Modal
-        title={editingItem?.status === 'Pending' ? '编辑工时' : '查看工时'}
+        title={editingItem?.status === 'Rejected' ? '重新编辑工时' : editingItem?.status === 'Pending' ? '编辑工时' : '查看工时'}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={editingItem?.status === 'Pending' ? null : <Button onClick={() => setIsModalVisible(false)}>关闭</Button>}
+        footer={(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected') ? null : <Button onClick={() => setIsModalVisible(false)}>关闭</Button>}
       >
         <Form
           form={form}
@@ -335,20 +370,20 @@ const WorkHourList = () => {
           >
             <InputNumber
               min={0.5}
-              max={8}
+              max={editingItem?.workType === 'overtime' ? 12 : 8}
               step={0.5}
               style={{ width: '100%' }}
               suffix="小时"
-              disabled={editingItem?.status !== 'Pending'}
+              disabled={!(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected')}
             />
           </Form.Item>
           <Form.Item label="工作内容" name="workContent">
-            <TextArea rows={3} disabled={editingItem?.status !== 'Pending'} />
+            <TextArea rows={3} disabled={!(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected')} />
           </Form.Item>
-          {editingItem?.status === 'Pending' && (
+          {(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected') && (
             <Form.Item>
               <Button type="primary" htmlType="submit" block>
-                保存修改
+                {editingItem?.status === 'Rejected' ? '保存并转为待提交' : '保存修改'}
               </Button>
             </Form.Item>
           )}
