@@ -6,6 +6,7 @@ import WorkHourForm from './pages/WorkHourForm';
 import WorkHourList from './pages/WorkHourList';
 import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
+import AdminStatistics from './pages/AdminStatistics';
 import AdminPanel from './pages/AdminPanel';
 import DataSync from './pages/DataSync';
 import CustomLayout from './components/Layout';
@@ -65,6 +66,8 @@ function App() {
         return <ApprovalList />;
       case 'statistics':
         return <Statistics onPageChange={handlePageChange} />;
+      case 'adminStats':
+        return <AdminStatistics />;
       case 'admin':
         return <AdminPanel />;
       case 'sync':

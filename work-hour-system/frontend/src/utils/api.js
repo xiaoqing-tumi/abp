@@ -19,13 +19,13 @@ const mockProjects = [
 ];
 
 let mockWorkHours = [
-  { id: 1, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '系统功能开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00' },
-  { id: 2, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 2, workContent: '线上问题修复', workType: 'overtime', status: 'Submitted', createTime: '2026-04-28 20:00:00', submitTime: '2026-04-28 21:00:00' },
-  { id: 3, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 4, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00' },
-  { id: 5, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00' },
-  { id: 6, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 7, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00' },
+  { id: 1, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '系统功能开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00' },
+  { id: 2, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 2, workContent: '线上问题修复', workType: 'overtime', status: 'Submitted', createTime: '2026-04-28 20:00:00', submitTime: '2026-04-28 21:00:00' },
+  { id: 3, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
+  { id: 4, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00' },
+  { id: 5, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00' },
+  { id: 6, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
+  { id: 7, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00' },
 ];
 
 let mockSyncLogs = [
@@ -140,6 +140,17 @@ export const workHourAPI = {
     }
     return api.get('/work-hours', { params });
   },
+  getAllWorkHours: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockWorkHours,
+        },
+      }));
+    }
+    return api.get('/work-hours/all');
+  },
   getWorkHour: (id) => {
     if (USE_MOCK) {
       return mockRequest(() => ({
@@ -161,6 +172,8 @@ export const workHourAPI = {
           ...data,
           personCode: user.personCode,
           personName: user.name,
+          departmentId: user.departmentId,
+          departmentName: user.departmentName,
           projectName: project?.projectName || data.projectCode,
           status: 'Pending',
           createTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
@@ -428,6 +441,82 @@ export const statisticsAPI = {
       }));
     }
     return api.get('/statistics/personal', { params });
+  },
+  getCompanyStatistics: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const totalHours = mockWorkHours.reduce((sum, item) => sum + (item.workHours || 0), 0);
+        const normalHours = mockWorkHours.filter(w => !w.workType || w.workType === 'normal').reduce((sum, item) => sum + (item.workHours || 0), 0);
+        const overtimeHours = mockWorkHours.filter(w => w.workType === 'overtime').reduce((sum, item) => sum + (item.workHours || 0), 0);
+        const approvedCount = mockWorkHours.filter(w => w.status === 'Approved').length;
+        const submittedCount = mockWorkHours.filter(w => w.status === 'Submitted').length;
+        
+        const personStats = {};
+        mockWorkHours.forEach(item => {
+          if (!personStats[item.personName]) {
+            personStats[item.personName] = {
+              name: item.personName,
+              department: item.departmentName,
+              totalHours: 0,
+              normalHours: 0,
+              overtimeHours: 0,
+              count: 0,
+            };
+          }
+          personStats[item.personName].totalHours += (item.workHours || 0);
+          personStats[item.personName].count++;
+          if (item.workType === 'overtime') {
+            personStats[item.personName].overtimeHours += (item.workHours || 0);
+          } else {
+            personStats[item.personName].normalHours += (item.workHours || 0);
+          }
+        });
+        
+        const departmentStats = {};
+        mockWorkHours.forEach(item => {
+          if (!departmentStats[item.departmentName]) {
+            departmentStats[item.departmentName] = {
+              name: item.departmentName,
+              totalHours: 0,
+              employeeCount: 0,
+            };
+          }
+          departmentStats[item.departmentName].totalHours += (item.workHours || 0);
+        });
+        
+        const projectStats = {};
+        mockWorkHours.forEach(item => {
+          if (!projectStats[item.projectName]) {
+            projectStats[item.projectName] = {
+              name: item.projectName,
+              totalHours: 0,
+              count: 0,
+            };
+          }
+          projectStats[item.projectName].totalHours += (item.workHours || 0);
+          projectStats[item.projectName].count++;
+        });
+        
+        return {
+          data: {
+            code: 200,
+            data: {
+              totalHours: totalHours.toFixed(1),
+              normalHours: normalHours.toFixed(1),
+              overtimeHours: overtimeHours.toFixed(1),
+              employeeCount: mockUsers.filter(u => u.role === 'Employee').length,
+              totalRecords: mockWorkHours.length,
+              approvedCount,
+              submittedCount,
+              personList: Object.values(personStats),
+              departmentList: Object.values(departmentStats),
+              projectList: Object.values(projectStats),
+            },
+          },
+        };
+      });
+    }
+    return api.get('/statistics/company');
   },
   getDepartmentStatistics: (params) => {
     if (USE_MOCK) {
