@@ -45,34 +45,30 @@ const ApprovalList = () => {
   }, []);
 
   useEffect(() => {
-    if (statusFilter === 'all') {
-      setFilteredData(allData);
-    } else {
-      const filtered = allData.filter(item => item.status === statusFilter);
-      setFilteredData(filtered);
+    let result = [...allData];
+    
+    if (currentUser?.role === 'PM') {
+      result = result.filter(w => {
+        const project = mockProjects.find(p => p.projectCode === w.projectCode);
+        return project && project.managerCode === currentUser.personCode;
+      });
+    } else if (currentUser?.role === 'Admin') {
+      result = result.filter(w => w.status === 'Submitted' || w.status === 'PMApproved' || w.status === 'Approved' || w.status === 'Rejected');
     }
-  }, [statusFilter, allData]);
+    
+    if (statusFilter !== 'all') {
+      result = result.filter(item => item.status === statusFilter);
+    }
+    
+    setFilteredData(result);
+  }, [statusFilter, allData, currentUser]);
 
   const fetchWorkHours = async () => {
     setLoading(true);
     try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await workHourAPI.getWorkHours({});
       if (response.data.code === 200) {
         setAllData(response.data.data);
-        
-        if (user.role === 'PM') {
-          const pmPending = response.data.data.filter(w => {
-            const project = mockProjects.find(p => p.projectCode === w.projectCode);
-            return project && project.managerCode === user.personCode && w.status === 'Submitted';
-          });
-          setFilteredData(pmPending);
-        } else if (user.role === 'DeptManager') {
-          const deptPending = response.data.data.filter(w => w.status === 'Submitted' || w.status === 'PMApproved');
-          setFilteredData(deptPending);
-        } else {
-          setFilteredData(response.data.data);
-        }
       }
     } catch (error) {
       message.error('加载失败');
@@ -309,7 +305,7 @@ const ApprovalList = () => {
       });
     }
     return result;
-  }, [visibleColumns]);
+  }, [visibleColumns, currentUser]);
 
   const handleColumnToggle = (columnKey) => {
     setVisibleColumns((prev) => ({
