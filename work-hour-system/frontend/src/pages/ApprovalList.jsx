@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select, Tag } from 'antd';
+import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select, Tag, Input } from 'antd';
 import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI, mockProjects } from '../utils/api';
 
 const { Option } = Select;
-const { TextArea } = Modal;
+const { TextArea } = Input;
 
 const ApprovalList = () => {
   const [allData, setAllData] = useState([]);
