@@ -328,10 +328,11 @@ const ApprovalList = () => {
 
   const stats = useMemo(() => {
     const submitted = allData.filter(item => item.status === 'Submitted').length;
+    const pmApproved = allData.filter(item => item.status === 'PMApproved').length;
     const approved = allData.filter(item => item.status === 'Approved').length;
     const rejected = allData.filter(item => item.status === 'Rejected').length;
     const pending = allData.filter(item => item.status === 'Pending').length;
-    return { submitted, approved, rejected, pending, total: allData.length };
+    return { submitted, pmApproved, approved, rejected, pending, total: allData.length };
   }, [allData]);
 
   return (
@@ -358,6 +359,7 @@ const ApprovalList = () => {
               <Option value="all">全部</Option>
               <Option value="Pending">待提交</Option>
               <Option value="Submitted">待审批</Option>
+              <Option value="PMApproved">项目经理已审批</Option>
               <Option value="Approved">已审批</Option>
               <Option value="Rejected">已驳回</Option>
             </Select>
@@ -390,6 +392,29 @@ const ApprovalList = () => {
               <div>
                 <div style={{ fontSize: 12, color: '#999' }}>待审批</div>
                 <div style={{ fontSize: 24, fontWeight: 600, color: '#faad14' }}>{stats.submitted}条</div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card
+            style={{ 
+              borderRadius: 6, 
+              border: '1px solid #f0f0f0', 
+              boxShadow: 'none',
+              cursor: 'pointer',
+              borderColor: statusFilter === 'PMApproved' ? '#fa8c16' : '#f0f0f0',
+            }}
+            onClick={() => setStatusFilter('PMApproved')}
+            hoverable
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, background: '#fff7e6', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <CheckOutlined style={{ color: '#fa8c16', fontSize: 20 }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#999' }}>项目经理已审批</div>
+                <div style={{ fontSize: 24, fontWeight: 600, color: '#fa8c16' }}>{stats.pmApproved}条</div>
               </div>
             </div>
           </Card>
