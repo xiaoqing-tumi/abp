@@ -350,7 +350,15 @@ const ApprovalList = () => {
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}>
           <Card
-            style={{ borderRadius: 6, border: '1px solid #f0f0f0', boxShadow: 'none' }}
+            style={{ 
+              borderRadius: 6, 
+              border: '1px solid #f0f0f0', 
+              boxShadow: 'none',
+              cursor: 'pointer',
+              borderColor: statusFilter === 'Submitted' ? '#faad14' : '#f0f0f0',
+            }}
+            onClick={() => setStatusFilter('Submitted')}
+            hoverable
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 40, height: 40, background: '#fffbe6', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -365,7 +373,15 @@ const ApprovalList = () => {
         </Col>
         <Col span={6}>
           <Card
-            style={{ borderRadius: 6, border: '1px solid #f0f0f0', boxShadow: 'none' }}
+            style={{ 
+              borderRadius: 6, 
+              border: '1px solid #f0f0f0', 
+              boxShadow: 'none',
+              cursor: 'pointer',
+              borderColor: statusFilter === 'Approved' ? '#52c41a' : '#f0f0f0',
+            }}
+            onClick={() => setStatusFilter('Approved')}
+            hoverable
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 40, height: 40, background: '#f6ffed', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -380,7 +396,15 @@ const ApprovalList = () => {
         </Col>
         <Col span={6}>
           <Card
-            style={{ borderRadius: 6, border: '1px solid #f0f0f0', boxShadow: 'none' }}
+            style={{ 
+              borderRadius: 6, 
+              border: '1px solid #f0f0f0', 
+              boxShadow: 'none',
+              cursor: 'pointer',
+              borderColor: statusFilter === 'Rejected' ? '#ff4d4f' : '#f0f0f0',
+            }}
+            onClick={() => setStatusFilter('Rejected')}
+            hoverable
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 40, height: 40, background: '#fff2f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -395,7 +419,15 @@ const ApprovalList = () => {
         </Col>
         <Col span={6}>
           <Card
-            style={{ borderRadius: 6, border: '1px solid #f0f0f0', boxShadow: 'none' }}
+            style={{ 
+              borderRadius: 6, 
+              border: '1px solid #f0f0f0', 
+              boxShadow: 'none',
+              cursor: 'pointer',
+              borderColor: statusFilter === 'all' ? '#1890ff' : '#f0f0f0',
+            }}
+            onClick={() => setStatusFilter('all')}
+            hoverable
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 40, height: 40, background: '#e6f7ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
