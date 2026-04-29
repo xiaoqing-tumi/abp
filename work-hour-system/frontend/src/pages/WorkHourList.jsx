@@ -13,11 +13,12 @@ const WorkHourList = ({ type }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [form] = Form.useForm();
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchWorkHours();
     fetchProjects();
-  }, [type]);
+  }, [type, statusFilter]);
 
   const fetchWorkHours = async () => {
     setLoading(true);
@@ -39,6 +40,9 @@ const WorkHourList = ({ type }) => {
         params.workType = 'overtime';
       } else if (type === 'normal') {
         params.workType = 'normal';
+      }
+      if (statusFilter !== 'all') {
+        params.status = statusFilter;
       }
       const response = await workHourAPI.getWorkHours(params);
       if (response.data.code === 200) {
@@ -181,6 +185,38 @@ const WorkHourList = ({ type }) => {
   return (
     <>
       <Card title="工时记录">
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          <Button
+            type={statusFilter === 'all' ? 'primary' : 'default'}
+            onClick={() => setStatusFilter('all')}
+          >
+            全部
+          </Button>
+          <Button
+            type={statusFilter === 'Pending' ? 'primary' : 'default'}
+            onClick={() => setStatusFilter('Pending')}
+          >
+            待提交
+          </Button>
+          <Button
+            type={statusFilter === 'Submitted' ? 'primary' : 'default'}
+            onClick={() => setStatusFilter('Submitted')}
+          >
+            待审批
+          </Button>
+          <Button
+            type={statusFilter === 'Approved' ? 'primary' : 'default'}
+            onClick={() => setStatusFilter('Approved')}
+          >
+            已审批
+          </Button>
+          <Button
+            type={statusFilter === 'Rejected' ? 'primary' : 'default'}
+            onClick={() => setStatusFilter('Rejected')}
+          >
+            已驳回
+          </Button>
+        </div>
         <Table
           columns={columns}
           dataSource={data}
