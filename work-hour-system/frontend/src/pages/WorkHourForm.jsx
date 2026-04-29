@@ -12,13 +12,13 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [selectedDateHours, setSelectedDateHours] = useState(0);
+  const [selectedDateOvertimeHours, setSelectedDateOvertimeHours] = useState(0);
   const [allWorkHours, setAllWorkHours] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs(workDate));
+  const [workType, setWorkType] = useState('normal');
 
-  const maxHours = 8;
-  const remainingHours = maxHours - selectedDateHours;
-  const isToday = dayjs(selectedDate).isSame(dayjs(), 'day');
-  const isPastDate = dayjs(selectedDate).isBefore(dayjs(), 'day');
+  const maxNormalHours = 8;
+  const remainingNormalHours = maxNormalHours - selectedDateHours;
 
   useEffect(() => {
     basicDataAPI.getMyProjects().then((response) => {
@@ -47,13 +47,25 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
     const dateRecords = workHoursData.filter(item => 
       dayjs(item.workDate).format('YYYY-MM-DD') === targetDate
     );
-    const hours = dateRecords.reduce((sum, item) => sum + (item.workHours || 0), 0);
-    setSelectedDateHours(hours);
+    
+    const normalHours = dateRecords.filter(item => !item.workType || item.workType === 'normal')
+      .reduce((sum, item) => sum + (item.workHours || 0), 0);
+    const overtimeHours = dateRecords.filter(item => item.workType === 'overtime')
+      .reduce((sum, item) => sum + (item.workHours || 0), 0);
+    
+    setSelectedDateHours(normalHours);
+    setSelectedDateOvertimeHours(overtimeHours);
   };
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
     calculateSelectedDateHours(allWorkHours, date);
+    form.setFieldsValue({ workType: 'normal' });
+    setWorkType('normal');
+  };
+
+  const handleWorkTypeChange = (value) => {
+    setWorkType(value);
   };
 
   useEffect(() => {
@@ -62,8 +74,10 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
   }, [workDate, form]);
 
   const handleSubmit = async (values) => {
-    if (values.workHours > remainingHours) {
-      message.error(`${dayjs(values.workDate).format('YYYY-MM-DD')}剩余可填报工时为 ${remainingHours} 小时`);
+    const hours = values.workHours;
+    
+    if (values.workType === 'normal' && hours > remainingNormalHours) {
+      message.error(`${dayjs(values.workDate).format('YYYY-MM-DD')}剩余正常工时为 ${remainingNormalHours} 小时，请选择加班类型或减少工时`);
       return;
     }
 
@@ -72,14 +86,16 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
       const response = await workHourAPI.createWorkHour({
         projectCode: values.projectCode,
         workDate: values.workDate.format('YYYY-MM-DD'),
-        workHours: values.workHours,
+        workHours: hours,
         workContent: values.workContent,
+        workType: values.workType,
       });
 
       if (response.data.code === 200) {
         message.success('工时填报成功');
         form.resetFields();
-        form.setFieldsValue({ workDate: selectedDate, workHours: 1 });
+        form.setFieldsValue({ workDate: selectedDate, workHours: 1, workType: 'normal' });
+        setWorkType('normal');
         fetchAllWorkHours();
         if (onSubmit) {
           onSubmit();
@@ -94,10 +110,12 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
     }
   };
 
+  const maxHours = workType === 'overtime' ? 12 : Math.max(0.5, remainingNormalHours);
+
   return (
     <div>
       <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={8}>
+        <Col span={6}>
           <Card
             style={{
               borderRadius: 8,
@@ -106,7 +124,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             }}
           >
             <Statistic
-              title={`${dayjs(selectedDate).format('YYYY-MM-DD')}已填报`}
+              title={`${dayjs(selectedDate).format('MM-DD')}正常工时`}
               value={selectedDateHours}
               suffix="小时"
               prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
@@ -114,7 +132,24 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
+          <Card
+            style={{
+              borderRadius: 8,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
+            }}
+          >
+            <Statistic
+              title="加班工时"
+              value={selectedDateOvertimeHours}
+              suffix="小时"
+              prefix={<ClockCircleOutlined style={{ color: '#fa8c16' }} />}
+              valueStyle={{ color: '#fa8c16', fontSize: 24, fontWeight: 600 }}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
           <Card
             style={{
               borderRadius: 8,
@@ -124,14 +159,14 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
           >
             <Statistic
               title="剩余可填"
-              value={remainingHours}
+              value={remainingNormalHours}
               suffix="小时"
-              prefix={<CalendarOutlined style={{ color: remainingHours > 0 ? '#52c41a' : '#ff4d4f' }} />}
-              valueStyle={{ color: remainingHours > 0 ? '#52c41a' : '#ff4d4f', fontSize: 24, fontWeight: 600 }}
+              prefix={<CalendarOutlined style={{ color: remainingNormalHours > 0 ? '#52c41a' : '#ff4d4f' }} />}
+              valueStyle={{ color: remainingNormalHours > 0 ? '#52c41a' : '#ff4d4f', fontSize: 24, fontWeight: 600 }}
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Card
             style={{
               borderRadius: 8,
@@ -140,8 +175,8 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             }}
           >
             <Statistic
-              title="标准工时"
-              value={maxHours}
+              title="当日总计"
+              value={(selectedDateHours + selectedDateOvertimeHours).toFixed(1)}
               suffix="小时"
               valueStyle={{ color: '#722ed1', fontSize: 24, fontWeight: 600 }}
             />
@@ -170,10 +205,11 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
           initialValues={{
             workHours: 1,
             workDate: dayjs(workDate),
+            workType: 'normal',
           }}
         >
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 label="项目"
                 name="projectCode"
@@ -197,7 +233,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item
                 label="日期"
                 name="workDate"
@@ -214,21 +250,37 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 />
               </Form.Item>
             </Col>
+            <Col span={8}>
+              <Form.Item
+                label="工作类型"
+                name="workType"
+              >
+                <Select 
+                  defaultValue="normal" 
+                  style={{ width: '100%' }} 
+                  size="large"
+                  onChange={handleWorkTypeChange}
+                >
+                  <Option value="normal">正常工时</Option>
+                  <Option value="overtime">加班</Option>
+                </Select>
+              </Form.Item>
+            </Col>
           </Row>
 
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
-                label="工时"
+                label={`${workType === 'overtime' ? '加班' : '工时'}（小时）`}
                 name="workHours"
                 rules={[{ required: true, message: '请输入工时' }]}
               >
                 <InputNumber
                   min={0.5}
-                  max={remainingHours > 0 ? remainingHours : 8}
+                  max={maxHours}
                   step={0.5}
                   style={{ width: '100%' }}
-                  placeholder="请输入工时"
+                  placeholder={`请输入${workType === 'overtime' ? '加班' : '工时'}`}
                   suffix="小时"
                   size="large"
                 />
@@ -263,7 +315,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 borderRadius: 6,
               }}
             >
-              {isPastDate && !isToday ? `补填${dayjs(selectedDate).format('MM月DD日')}工时` : '保存工时'}
+              {workType === 'overtime' ? '保存加班记录' : '保存工时'}
             </Button>
           </Form.Item>
         </Form>
