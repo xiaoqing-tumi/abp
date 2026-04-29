@@ -123,8 +123,8 @@ const ApprovalList = () => {
     if (visibleColumns.hours) {
       result.push({
         title: '工时(小时)',
-        dataIndex: 'hours',
-        key: 'hours',
+        dataIndex: 'workHours',
+        key: 'workHours',
         width: 120,
       });
     }
@@ -140,8 +140,8 @@ const ApprovalList = () => {
     if (visibleColumns.description) {
       result.push({
         title: '描述',
-        dataIndex: 'description',
-        key: 'description',
+        dataIndex: 'workContent',
+        key: 'workContent',
         ellipsis: true,
         width: 150,
       });
@@ -284,7 +284,7 @@ const ApprovalList = () => {
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工时</div>
-                <div style={{ fontSize: 16 }}>{selectedItem.hours} 小时</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.workHours} 小时</div>
               </Col>
               <Col span={12}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作类型</div>
@@ -294,7 +294,7 @@ const ApprovalList = () => {
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={24}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>工作描述</div>
-                <div style={{ fontSize: 16 }}>{selectedItem.description || '无'}</div>
+                <div style={{ fontSize: 16 }}>{selectedItem.workContent || '无'}</div>
               </Col>
             </Row>
             <Row gutter={16}>
