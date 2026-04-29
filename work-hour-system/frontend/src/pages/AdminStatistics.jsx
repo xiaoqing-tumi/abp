@@ -3,7 +3,7 @@ import { Card, Row, Col, Statistic, message, Table } from 'antd';
 import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, TeamOutlined, FolderOutlined, BankOutlined } from '@ant-design/icons';
 import { statisticsAPI } from '../utils/api';
 
-const AdminStatistics = () => {
+const AdminStatistics = ({ onViewDetail }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +26,16 @@ const AdminStatistics = () => {
   };
 
   const personColumns = [
-    { title: '员工姓名', dataIndex: 'name', key: 'name' },
+    { 
+      title: '员工姓名', 
+      dataIndex: 'name', 
+      key: 'name',
+      render: (text, record) => (
+        <a onClick={() => onViewDetail('person', text)} style={{ color: '#1890ff' }}>
+          {text}
+        </a>
+      ),
+    },
     { title: '部门', dataIndex: 'department', key: 'department' },
     { title: '总工时(小时)', dataIndex: 'totalHours', key: 'totalHours' },
     { title: '正常工时', dataIndex: 'normalHours', key: 'normalHours' },
@@ -35,12 +44,30 @@ const AdminStatistics = () => {
   ];
 
   const departmentColumns = [
-    { title: '部门名称', dataIndex: 'name', key: 'name' },
+    { 
+      title: '部门名称', 
+      dataIndex: 'name', 
+      key: 'name',
+      render: (text) => (
+        <a onClick={() => onViewDetail('department', text)} style={{ color: '#722ed1' }}>
+          {text}
+        </a>
+      ),
+    },
     { title: '总工时(小时)', dataIndex: 'totalHours', key: 'totalHours' },
   ];
 
   const projectColumns = [
-    { title: '项目名称', dataIndex: 'name', key: 'name' },
+    { 
+      title: '项目名称', 
+      dataIndex: 'name', 
+      key: 'name',
+      render: (text) => (
+        <a onClick={() => onViewDetail('project', text)} style={{ color: '#fa8c16' }}>
+          {text}
+        </a>
+      ),
+    },
     { title: '总工时(小时)', dataIndex: 'totalHours', key: 'totalHours' },
     { title: '记录数', dataIndex: 'count', key: 'count' },
   ];

@@ -7,6 +7,7 @@ import WorkHourList from './pages/WorkHourList';
 import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
 import AdminStatistics from './pages/AdminStatistics';
+import AdminWorkHourDetail from './pages/AdminWorkHourDetail';
 import AdminPanel from './pages/AdminPanel';
 import DataSync from './pages/DataSync';
 import CustomLayout from './components/Layout';
@@ -18,6 +19,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('workhour');
   const [listType, setListType] = useState(null);
   const [showLogin, setShowLogin] = useState(true);
+  const [detailFilter, setDetailFilter] = useState({ type: null, value: null });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -56,6 +58,16 @@ function App() {
     }
   };
 
+  const handleViewDetail = (type, value) => {
+    setDetailFilter({ type, value });
+    setCurrentPage('adminDetail');
+  };
+
+  const handleBackToStats = () => {
+    setDetailFilter({ type: null, value: null });
+    setCurrentPage('adminStats');
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case 'workhour':
@@ -67,7 +79,9 @@ function App() {
       case 'statistics':
         return <Statistics onPageChange={handlePageChange} />;
       case 'adminStats':
-        return <AdminStatistics />;
+        return <AdminStatistics onViewDetail={handleViewDetail} />;
+      case 'adminDetail':
+        return <AdminWorkHourDetail filterType={detailFilter.type} filterValue={detailFilter.value} onBack={handleBackToStats} />;
       case 'admin':
         return <AdminPanel />;
       case 'sync':
