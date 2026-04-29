@@ -1,16 +1,19 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select } from 'antd';
-import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined } from '@ant-design/icons';
+import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select, Tag } from 'antd';
+import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined, AlertCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
 const { Option } = Select;
+const { TextArea } = Modal;
 
 const ApprovalList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [visibleColumns, setVisibleColumns] = useState({
     personName: true,
@@ -22,6 +25,9 @@ const ApprovalList = () => {
     workContent: true,
     status: true,
     submitTime: true,
+    approverName: true,
+    approveTime: true,
+    rejectReason: true,
     actions: true,
   });
 
@@ -51,7 +57,8 @@ const ApprovalList = () => {
 
   const handleApprove = async (id) => {
     try {
-      const response = await workHourAPI.approveWorkHour(id);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await workHourAPI.approveWorkHour(id, user.name);
       if (response.data.code === 200) {
         message.success('审批通过');
         fetchWorkHours();
@@ -65,9 +72,12 @@ const ApprovalList = () => {
 
   const handleReject = async (id) => {
     try {
-      const response = await workHourAPI.rejectWorkHour(id);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await workHourAPI.rejectWorkHour(id, user.name, rejectReason);
       if (response.data.code === 200) {
         message.success('已驳回');
+        setRejectModalVisible(false);
+        setRejectReason('');
         fetchWorkHours();
       } else {
         message.error(response.data.message);
@@ -80,6 +90,12 @@ const ApprovalList = () => {
   const handleView = (record) => {
     setSelectedItem(record);
     setIsModalVisible(true);
+  };
+
+  const handleOpenRejectModal = (record) => {
+    setSelectedItem(record);
+    setRejectReason('');
+    setRejectModalVisible(true);
   };
 
   const statusMap = {
@@ -99,6 +115,9 @@ const ApprovalList = () => {
     { key: 'workContent', title: '描述' },
     { key: 'status', title: '状态' },
     { key: 'submitTime', title: '提交时间' },
+    { key: 'approverName', title: '审批人' },
+    { key: 'approveTime', title: '审批时间' },
+    { key: 'rejectReason', title: '驳回原因' },
     { key: 'actions', title: '操作' },
   ];
 
@@ -173,21 +192,9 @@ const ApprovalList = () => {
         render: (text) => {
           const status = statusMap[text] || { label: text, color: 'default' };
           return (
-            <span
-              style={{
-                padding: '4px 12px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                backgroundColor: status.color === 'success' ? '#f6ffed' :
-                  status.color === 'error' ? '#fff2f0' :
-                  status.color === 'processing' ? '#fffbe6' : '#f5f5f5',
-                color: status.color === 'success' ? '#52c41a' :
-                  status.color === 'error' ? '#ff4d4f' :
-                  status.color === 'processing' ? '#faad14' : '#666',
-              }}
-            >
+            <Tag color={status.color}>
               {status.label}
-            </span>
+            </Tag>
           );
         },
       });
@@ -199,6 +206,40 @@ const ApprovalList = () => {
         key: 'submitTime',
         render: (text) => text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-',
         width: 160,
+      });
+    }
+    if (visibleColumns.approverName) {
+      result.push({
+        title: '审批人',
+        dataIndex: 'approverName',
+        key: 'approverName',
+        width: 100,
+        render: (text) => text || '-',
+      });
+    }
+    if (visibleColumns.approveTime) {
+      result.push({
+        title: '审批时间',
+        dataIndex: 'approveTime',
+        key: 'approveTime',
+        width: 160,
+        render: (text) => text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-',
+      });
+    }
+    if (visibleColumns.rejectReason) {
+      result.push({
+        title: '驳回原因',
+        dataIndex: 'rejectReason',
+        key: 'rejectReason',
+        width: 200,
+        render: (text) => {
+          if (!text) return '-';
+          return (
+            <span style={{ color: '#ff4d4f', fontSize: 12 }}>
+              {text}
+            </span>
+          );
+        },
       });
     }
     if (visibleColumns.actions) {
@@ -230,7 +271,7 @@ const ApprovalList = () => {
                   danger
                   size="small"
                   icon={<CloseOutlined />}
-                  onClick={() => handleReject(record.id)}
+                  onClick={() => handleOpenRejectModal(record)}
                 >
                   驳回
                 </Button>
@@ -432,15 +473,88 @@ const ApprovalList = () => {
             <Row gutter={16} style={{ marginBottom: 16 }}>
               <Col span={12}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>状态</div>
-                <div style={{ fontSize: 16 }}>{statusMap[selectedItem.status]?.label || selectedItem.status}</div>
+                <div style={{ fontSize: 16 }}>
+                  <Tag color={statusMap[selectedItem.status]?.color}>
+                    {statusMap[selectedItem.status]?.label || selectedItem.status}
+                  </Tag>
+                </div>
               </Col>
               <Col span={12}>
                 <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>提交时间</div>
                 <div style={{ fontSize: 16 }}>{selectedItem.submitTime ? dayjs(selectedItem.submitTime).format('YYYY-MM-DD HH:mm') : '-'}</div>
               </Col>
             </Row>
+            {selectedItem.status === 'Approved' || selectedItem.status === 'Rejected' ? (
+              <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Col span={12}>
+                  <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>审批人</div>
+                  <div style={{ fontSize: 16 }}>{selectedItem.approverName || '-'}</div>
+                </Col>
+                <Col span={12}>
+                  <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>审批时间</div>
+                  <div style={{ fontSize: 16 }}>{selectedItem.approveTime ? dayjs(selectedItem.approveTime).format('YYYY-MM-DD HH:mm') : '-'}</div>
+                </Col>
+              </Row>
+            ) : null}
+            {selectedItem.rejectReason ? (
+              <Row gutter={16}>
+                <Col span={24}>
+                  <div style={{ fontWeight: 500, color: '#666', marginBottom: 4 }}>驳回原因</div>
+                  <div style={{ fontSize: 16, color: '#ff4d4f' }}>{selectedItem.rejectReason}</div>
+                </Col>
+              </Row>
+            ) : null}
           </div>
         )}
+      </Modal>
+
+      <Modal
+        title="驳回申请"
+        open={rejectModalVisible}
+        onCancel={() => {
+          setRejectModalVisible(false);
+          setRejectReason('');
+        }}
+        footer={[
+          <Button key="back" onClick={() => {
+            setRejectModalVisible(false);
+            setRejectReason('');
+          }}>
+            取消
+          </Button>,
+          <Button 
+            key="submit" 
+            type="primary" 
+            danger 
+            onClick={() => selectedItem && handleReject(selectedItem.id)}
+            disabled={!rejectReason.trim()}
+          >
+            确认驳回
+          </Button>,
+        ]}
+      >
+        <div style={{ padding: 16 }}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontWeight: 500, color: '#666', marginBottom: 8 }}>
+              <AlertCircleOutlined style={{ marginRight: 4 }} />
+              请填写驳回原因
+            </div>
+            <TextArea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={4}
+              placeholder="请输入驳回原因，员工将根据此原因修改工时记录"
+            />
+          </div>
+          {selectedItem && (
+            <div style={{ padding: 12, background: '#f5f5f5', borderRadius: 4 }}>
+              <div style={{ fontSize: 12, color: '#666' }}>
+                <span style={{ fontWeight: 500 }}>驳回对象：</span>
+                {selectedItem.personName} - {selectedItem.projectName} - {dayjs(selectedItem.workDate).format('YYYY-MM-DD')}
+              </div>
+            </div>
+          )}
+        </div>
       </Modal>
     </Card>
   );

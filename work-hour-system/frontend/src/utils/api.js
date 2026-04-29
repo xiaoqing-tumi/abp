@@ -19,13 +19,13 @@ const mockProjects = [
 ];
 
 let mockWorkHours = [
-  { id: 1, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '系统功能开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00' },
-  { id: 2, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 2, workContent: '线上问题修复', workType: 'overtime', status: 'Submitted', createTime: '2026-04-28 20:00:00', submitTime: '2026-04-28 21:00:00' },
-  { id: 3, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 4, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00' },
-  { id: 5, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00' },
-  { id: 6, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 7, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00' },
+  { id: 1, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '系统功能开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00', approverName: null, approveTime: null, rejectReason: null },
+  { id: 2, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 2, workContent: '线上问题修复', workType: 'overtime', status: 'Submitted', createTime: '2026-04-28 20:00:00', submitTime: '2026-04-28 21:00:00', approverName: null, approveTime: null, rejectReason: null },
+  { id: 3, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00', approverName: '王经理', approveTime: '2026-04-27 19:30:00', rejectReason: null },
+  { id: 4, personCode: 'EMP001', personName: '张三', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00', approverName: '王经理', approveTime: '2026-04-25 20:00:00', rejectReason: '工作内容描述不够详细，请补充具体工作事项' },
+  { id: 5, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00', approverName: null, approveTime: null, rejectReason: null },
+  { id: 6, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00', approverName: '李项目经理', approveTime: '2026-04-27 21:00:00', rejectReason: null },
+  { id: 7, personCode: 'EMP002', personName: '李四', departmentId: 'TECH', departmentName: '技术部', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00', approverName: '李项目经理', approveTime: '2026-04-26 22:00:00', rejectReason: null },
 ];
 
 let mockSyncLogs = [
@@ -268,12 +268,14 @@ export const workHourAPI = {
     }
     return api.get('/work-hours/pending-approvals');
   },
-  approveWorkHour: (id) => {
+  approveWorkHour: (id, approverName) => {
     if (USE_MOCK) {
       return mockRequest(() => {
         const index = mockWorkHours.findIndex(w => w.id === id);
         if (index >= 0) {
           mockWorkHours[index].status = 'Approved';
+          mockWorkHours[index].approverName = approverName || '管理员';
+          mockWorkHours[index].approveTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
           return {
             data: {
               code: 200,
@@ -289,14 +291,17 @@ export const workHourAPI = {
         };
       });
     }
-    return api.post(`/work-hours/${id}/approve`);
+    return api.post(`/work-hours/${id}/approve`, { approverName });
   },
-  rejectWorkHour: (id) => {
+  rejectWorkHour: (id, approverName, reason) => {
     if (USE_MOCK) {
       return mockRequest(() => {
         const index = mockWorkHours.findIndex(w => w.id === id);
         if (index >= 0) {
           mockWorkHours[index].status = 'Rejected';
+          mockWorkHours[index].approverName = approverName || '管理员';
+          mockWorkHours[index].approveTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          mockWorkHours[index].rejectReason = reason || '未填写驳回原因';
           return {
             data: {
               code: 200,
@@ -312,7 +317,7 @@ export const workHourAPI = {
         };
       });
     }
-    return api.post(`/work-hours/${id}/reject`);
+    return api.post(`/work-hours/${id}/reject`, { approverName, reason });
   },
 };
 
