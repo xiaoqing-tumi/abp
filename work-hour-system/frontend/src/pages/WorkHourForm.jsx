@@ -5,14 +5,13 @@ import dayjs from 'dayjs';
 import { workHourAPI, basicDataAPI } from '../utils/api';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 const WorkHourForm = ({ workDate, onSubmit }) => {
   const [projects, setProjects] = useState([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [todayHours, setTodayHours] = useState(0);
-  const [lockedDate, setLockedDate] = useState(null);
-  const [pendingProcesses, setPendingProcesses] = useState([]);
 
   const maxHours = 8;
   const remainingHours = maxHours - todayHours;
@@ -23,28 +22,19 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
         setProjects(response.data.data);
       }
     });
-
-    basicDataAPI.getPendingOaProcesses().then((response) => {
-      if (response.data.code === 200) {
-        const pending = response.data.data || [];
-        setPendingProcesses(pending);
-        const today = dayjs().format('YYYY-MM-DD');
-        const todayPending = pending.find(p => dayjs(p.processDate).format('YYYY-MM-DD') === today);
-        if (todayPending) {
-          setLockedDate(todayPending);
-        }
-      }
-    });
-
     fetchTodayHours();
   }, []);
 
   const fetchTodayHours = async () => {
     try {
-      const today = dayjs().format('YYYY-MM-DD');
-      const response = await workHourAPI.getWorkHours({ startDate: today, endDate: today });
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const response = await workHourAPI.getWorkHours({ personCode: user.personCode });
       if (response.data.code === 200) {
-        const hours = response.data.data.reduce((sum, item) => sum + (item.hours || 0), 0);
+        const today = dayjs().format('YYYY-MM-DD');
+        const todayRecords = response.data.data.filter(item => 
+          dayjs(item.workDate).format('YYYY-MM-DD') === today
+        );
+        const hours = todayRecords.reduce((sum, item) => sum + (item.workHours || 0), 0);
         setTodayHours(hours);
       }
     } catch (error) {
@@ -57,7 +47,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
   }, [workDate, form]);
 
   const handleSubmit = async (values) => {
-    if (values.hours > remainingHours) {
+    if (values.workHours > remainingHours) {
       message.error(`今日剩余可填报工时为 ${remainingHours} 小时`);
       return;
     }
@@ -66,15 +56,15 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
     try {
       const response = await workHourAPI.createWorkHour({
         projectCode: values.projectCode,
-        workDate: values.workDate.toDate(),
-        hours: values.hours,
-        description: values.description,
-        workType: values.workType,
+        workDate: values.workDate.format('YYYY-MM-DD'),
+        workHours: values.workHours,
+        workContent: values.workContent,
       });
 
       if (response.data.code === 200) {
         message.success('工时填报成功');
         form.resetFields();
+        form.setFieldsValue({ workDate: dayjs(workDate), workHours: 1 });
         fetchTodayHours();
         if (onSubmit) {
           onSubmit();
@@ -92,7 +82,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
   return (
     <div>
       <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={6}>
+        <Col span={8}>
           <Card
             style={{
               borderRadius: 8,
@@ -109,7 +99,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={8}>
           <Card
             style={{
               borderRadius: 8,
@@ -126,7 +116,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={8}>
           <Card
             style={{
               borderRadius: 8,
@@ -142,44 +132,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card
-            style={{
-              borderRadius: 8,
-              border: '1px solid #f0f0f0',
-              boxShadow: 'none',
-            }}
-          >
-            <Statistic
-              title="待审批OA流程"
-              value={pendingProcesses.length}
-              suffix="条"
-              valueStyle={{ color: '#faad14', fontSize: 24, fontWeight: 600 }}
-            />
-          </Card>
-        </Col>
       </Row>
-
-      {lockedDate && (
-        <Card
-          style={{
-            marginBottom: 16,
-            borderRadius: 8,
-            border: '1px solid #faad14',
-          }}
-        >
-          <div style={{ padding: 12, background: '#fffbe6', borderRadius: 6 }}>
-            <p style={{ marginBottom: 6, fontWeight: 'bold', color: '#fa8c16' }}>
-              ⚠️ 今日因{lockedDate.type === 'leave' ? '请假' : '出差'}申请审批中，工时已由系统自动生成
-            </p>
-            <p style={{ color: '#d48806', fontSize: 13 }}>
-              流程类型：{lockedDate.type === 'leave' ? '请假' : '出差'}
-              {' | '}时长：{lockedDate.durationHours}小时
-              {' | '}状态：待审批
-            </p>
-          </div>
-        </Card>
-      )}
 
       <Card
         style={{
@@ -200,11 +153,9 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
           onFinish={handleSubmit}
           layout="vertical"
           initialValues={{
-            hours: 1,
-            workType: 'normal',
-            description: '',
+            workHours: 1,
+            workDate: dayjs(workDate),
           }}
-          disabled={!!lockedDate}
         >
           <Row gutter={16}>
             <Col span={12}>
@@ -221,6 +172,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                     option.children.toLowerCase().includes(input.toLowerCase())
                   }
                   style={{ width: '100%' }}
+                  size="large"
                 >
                   {projects.map((project) => (
                     <Option key={project.projectCode} value={project.projectCode}>
@@ -242,6 +194,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                   }}
                   style={{ width: '100%' }}
                   placeholder="选择日期"
+                  size="large"
                 />
               </Form.Item>
             </Col>
@@ -251,7 +204,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             <Col span={12}>
               <Form.Item
                 label="工时"
-                name="hours"
+                name="workHours"
                 rules={[{ required: true, message: '请输入工时' }]}
               >
                 <InputNumber
@@ -265,24 +218,13 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                label="工作类型"
-                name="workType"
-              >
-                <Select defaultValue="normal" style={{ width: '100%' }} size="large">
-                  <Option value="normal">正常工时</Option>
-                  <Option value="overtime">加班</Option>
-                </Select>
-              </Form.Item>
-            </Col>
           </Row>
 
           <Form.Item
-            label="工作描述"
-            name="description"
+            label="工作内容"
+            name="workContent"
           >
-            <Input.TextArea
+            <TextArea
               placeholder="请简要描述今日工作内容..."
               rows={3}
               style={{ borderRadius: 6 }}
@@ -297,7 +239,6 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
               block
               size="large"
               icon={<SaveOutlined />}
-              disabled={!!lockedDate}
               style={{
                 height: 40,
                 fontSize: 14,
@@ -306,7 +247,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 borderRadius: 6,
               }}
             >
-              {lockedDate ? '当日工时已被锁定' : '保存工时'}
+              保存工时
             </Button>
           </Form.Item>
         </Form>

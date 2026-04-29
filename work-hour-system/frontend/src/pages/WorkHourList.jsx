@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined } from '@ant-design/icons';
+import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Tag } from 'antd';
+import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const { TextArea } = Input;
 
 const WorkHourList = () => {
   const [data, setData] = useState([]);
@@ -18,10 +19,9 @@ const WorkHourList = () => {
   const [visibleColumns, setVisibleColumns] = useState({
     workDate: true,
     projectName: true,
-    hours: true,
-    workType: true,
+    workHours: true,
     status: true,
-    source: true,
+    workContent: true,
     actions: true,
   });
 
@@ -32,13 +32,22 @@ const WorkHourList = () => {
   const fetchWorkHours = async () => {
     setLoading(true);
     try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await workHourAPI.getWorkHours({
-        startDate: dateRange[0].toISOString(),
-        endDate: dateRange[1].toISOString(),
+        personCode: user.personCode,
         status: statusFilter || undefined,
       });
       if (response.data.code === 200) {
-        setData(response.data.data);
+        let result = response.data.data;
+        if (dateRange && dateRange[0] && dateRange[1]) {
+          const startDate = dateRange[0].format('YYYY-MM-DD');
+          const endDate = dateRange[1].format('YYYY-MM-DD');
+          result = result.filter(item => {
+            const itemDate = dayjs(item.workDate).format('YYYY-MM-DD');
+            return itemDate >= startDate && itemDate <= endDate;
+          });
+        }
+        setData(result);
       }
     } catch (error) {
       message.error('加载失败');
@@ -48,15 +57,14 @@ const WorkHourList = () => {
   };
 
   const handleEdit = (record) => {
-    if (record.status !== 'draft') {
-      message.warning('只能编辑草稿状态的工时记录');
+    if (record.status !== 'Pending') {
+      message.warning('只能编辑待提交状态的工时记录');
       return;
     }
     setEditingItem(record);
     form.setFieldsValue({
-      hours: record.hours,
-      description: record.description,
-      workType: record.workType,
+      workHours: record.workHours,
+      workContent: record.workContent,
     });
     setIsModalVisible(true);
   };
@@ -64,9 +72,8 @@ const WorkHourList = () => {
   const handleView = (record) => {
     setEditingItem(record);
     form.setFieldsValue({
-      hours: record.hours,
-      description: record.description,
-      workType: record.workType,
+      workHours: record.workHours,
+      workContent: record.workContent,
     });
     setIsModalVisible(true);
   };
@@ -102,9 +109,8 @@ const WorkHourList = () => {
   const handleSaveEdit = async (values) => {
     try {
       const response = await workHourAPI.updateWorkHour(editingItem.id, {
-        hours: values.hours,
-        description: values.description,
-        workType: values.workType,
+        workHours: values.workHours,
+        workContent: values.workContent,
       });
       if (response.data.code === 200) {
         message.success('修改成功');
@@ -121,12 +127,18 @@ const WorkHourList = () => {
   const allColumns = [
     { key: 'workDate', title: '日期' },
     { key: 'projectName', title: '项目' },
-    { key: 'hours', title: '工时(小时)' },
-    { key: 'workType', title: '工作类型' },
+    { key: 'workHours', title: '工时(小时)' },
     { key: 'status', title: '状态' },
-    { key: 'source', title: '来源' },
+    { key: 'workContent', title: '工作内容' },
     { key: 'actions', title: '操作' },
   ];
+
+  const statusMap = {
+    Pending: { label: '待提交', color: 'default' },
+    Submitted: { label: '已提交', color: 'processing' },
+    Approved: { label: '已审批', color: 'success' },
+    Rejected: { label: '已驳回', color: 'error' },
+  };
 
   const columns = useMemo(() => {
     const result = [];
@@ -135,8 +147,8 @@ const WorkHourList = () => {
         title: '日期',
         dataIndex: 'workDate',
         key: 'workDate',
-        render: (text) => dayjs(text).format('YYYY-MM-DD'),
         width: 120,
+        render: (text) => dayjs(text).format('YYYY-MM-DD'),
       });
     }
     if (visibleColumns.projectName) {
@@ -145,24 +157,15 @@ const WorkHourList = () => {
         dataIndex: 'projectName',
         key: 'projectName',
         ellipsis: true,
-        width: 150,
+        width: 180,
       });
     }
-    if (visibleColumns.hours) {
+    if (visibleColumns.workHours) {
       result.push({
         title: '工时(小时)',
-        dataIndex: 'hours',
-        key: 'hours',
-        width: 120,
-      });
-    }
-    if (visibleColumns.workType) {
-      result.push({
-        title: '工作类型',
-        dataIndex: 'workType',
-        key: 'workType',
+        dataIndex: 'workHours',
+        key: 'workHours',
         width: 100,
-        render: (text) => (text === 'normal' ? '正常工时' : '加班'),
       });
     }
     if (visibleColumns.status) {
@@ -172,35 +175,18 @@ const WorkHourList = () => {
         key: 'status',
         width: 100,
         render: (text) => {
-          const statusMap = {
-            draft: { label: '草稿', color: 'gray' },
-            submitted: { label: '已提交', color: 'blue' },
-            approved: { label: '已审批', color: 'green' },
-          };
-          const status = statusMap[text] || { label: text, color: 'gray' };
-          return (
-            <span
-              style={{
-                padding: '4px 12px',
-                borderRadius: 4,
-                backgroundColor: status.color === 'green' ? '#f6ffed' : status.color === 'blue' ? '#e6f7ff' : '#f5f5f5',
-                color: status.color === 'green' ? '#52c41a' : status.color === 'blue' ? '#1890ff' : '#666',
-                fontSize: 12,
-              }}
-            >
-              {status.label}
-            </span>
-          );
+          const status = statusMap[text] || { label: text, color: 'default' };
+          return <Tag color={status.color}>{status.label}</Tag>;
         },
       });
     }
-    if (visibleColumns.source) {
+    if (visibleColumns.workContent) {
       result.push({
-        title: '来源',
-        dataIndex: 'source',
-        key: 'source',
-        width: 80,
-        render: (text) => (text === 'auto' ? '系统自动' : '手动填报'),
+        title: '工作内容',
+        dataIndex: 'workContent',
+        key: 'workContent',
+        ellipsis: true,
+        width: 200,
       });
     }
     if (visibleColumns.actions) {
@@ -210,7 +196,7 @@ const WorkHourList = () => {
         width: 200,
         render: (_, record) => (
           <div style={{ display: 'flex', gap: 8 }}>
-            {record.status === 'draft' && (
+            {record.status === 'Pending' && (
               <>
                 <Button
                   type="text"
@@ -239,7 +225,7 @@ const WorkHourList = () => {
                 </Button>
               </>
             )}
-            {record.status !== 'draft' && (
+            {record.status !== 'Pending' && (
               <Button
                 type="text"
                 size="small"
@@ -302,9 +288,10 @@ const WorkHourList = () => {
               style={{ width: 120 }}
             >
               <Option value="">全部</Option>
-              <Option value="draft">草稿</Option>
-              <Option value="submitted">已提交</Option>
-              <Option value="approved">已审批</Option>
+              <Option value="Pending">待提交</Option>
+              <Option value="Submitted">已提交</Option>
+              <Option value="Approved">已审批</Option>
+              <Option value="Rejected">已驳回</Option>
             </Select>
           </div>
         </div>
@@ -331,10 +318,10 @@ const WorkHourList = () => {
       />
 
       <Modal
-        title="编辑工时"
+        title={editingItem?.status === 'Pending' ? '编辑工时' : '查看工时'}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={null}
+        footer={editingItem?.status === 'Pending' ? null : <Button onClick={() => setIsModalVisible(false)}>关闭</Button>}
       >
         <Form
           form={form}
@@ -343,7 +330,7 @@ const WorkHourList = () => {
         >
           <Form.Item
             label="工时"
-            name="hours"
+            name="workHours"
             rules={[{ required: true, message: '请输入工时' }]}
           >
             <InputNumber
@@ -352,22 +339,19 @@ const WorkHourList = () => {
               step={0.5}
               style={{ width: '100%' }}
               suffix="小时"
+              disabled={editingItem?.status !== 'Pending'}
             />
           </Form.Item>
-          <Form.Item label="工作类型" name="workType">
-            <Select defaultValue="normal" style={{ width: '100%' }}>
-              <Option value="normal">正常工时</Option>
-              <Option value="overtime">加班</Option>
-            </Select>
+          <Form.Item label="工作内容" name="workContent">
+            <TextArea rows={3} disabled={editingItem?.status !== 'Pending'} />
           </Form.Item>
-          <Form.Item label="工作描述" name="description">
-            <Input.TextArea rows={3} />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              保存修改
-            </Button>
-          </Form.Item>
+          {editingItem?.status === 'Pending' && (
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                保存修改
+              </Button>
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </Card>

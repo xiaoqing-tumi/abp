@@ -1,6 +1,40 @@
 import axios from 'axios';
 
 const API_BASE_URL = '/api/v1';
+const USE_MOCK = true;
+
+const mockUsers = [
+  { personCode: 'EMP001', name: '张三', departmentName: '研发部', role: 'Employee' },
+  { personCode: 'EMP002', name: '李四', departmentName: '研发部', role: 'Employee' },
+  { personCode: 'MGR001', name: '王经理', departmentName: '研发部', role: 'Manager' },
+  { personCode: 'ADMIN', name: '系统管理员', departmentName: '管理部', role: 'Admin' },
+];
+
+const mockProjects = [
+  { projectCode: 'PRJ001', projectName: '智能工厂系统', customerName: '华为科技' },
+  { projectCode: 'PRJ002', projectName: '数据中台项目', customerName: '阿里巴巴' },
+  { projectCode: 'PRJ003', projectName: '移动办公平台', customerName: '腾讯科技' },
+  { projectCode: 'PRJ004', projectName: '智慧城市项目', customerName: '政府单位' },
+  { projectCode: 'PRJ005', projectName: '电商平台升级', customerName: '京东集团' },
+];
+
+let mockWorkHours = [
+  { id: 1, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 8, workContent: '系统功能开发', status: 'Submitted', createTime: '2026-04-28 09:00:00' },
+  { id: 2, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', status: 'Approved', createTime: '2026-04-27 09:00:00' },
+  { id: 3, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', status: 'Pending', createTime: '2026-04-28 10:00:00' },
+  { id: 4, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 8, workContent: 'APP功能测试', status: 'Approved', createTime: '2026-04-26 09:00:00' },
+  { id: 5, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', status: 'Rejected', createTime: '2026-04-25 09:00:00' },
+];
+
+let mockSyncLogs = [
+  { id: 1, syncTime: '2026-04-29 08:00:00', syncType: '自动同步', status: '成功', recordCount: 156, duration: '2.3s' },
+  { id: 2, syncTime: '2026-04-28 20:00:00', syncType: '自动同步', status: '成功', recordCount: 89, duration: '1.8s' },
+  { id: 3, syncTime: '2026-04-28 12:00:00', syncType: '手动同步', status: '成功', recordCount: 234, duration: '3.1s' },
+  { id: 4, syncTime: '2026-04-28 08:00:00', syncType: '自动同步', status: '成功', recordCount: 178, duration: '2.5s' },
+  { id: 5, syncTime: '2026-04-27 20:00:00', syncType: '自动同步', status: '失败', recordCount: 0, duration: '0.5s', errorMessage: '网络连接超时' },
+];
+
+let nextWorkHourId = 6;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -32,38 +66,476 @@ api.interceptors.response.use(
   }
 );
 
+const mockRequest = (handler) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(handler());
+    }, 200);
+  });
+};
+
 export const authAPI = {
-  login: (personCode) => api.post('/auth/login', { personCode }),
-  getUsers: () => api.get('/auth/users'),
+  login: (personCode) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const user = mockUsers.find(u => u.personCode === personCode);
+        if (user) {
+          return {
+            data: {
+              code: 200,
+              data: {
+                ...user,
+                token: `mock-token-${personCode}-${Date.now()}`,
+              },
+              message: '登录成功',
+            },
+          };
+        }
+        return {
+          data: {
+            code: 400,
+            message: '用户不存在',
+          },
+        };
+      });
+    }
+    return api.post('/auth/login', { personCode });
+  },
+  getUsers: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockUsers,
+        },
+      }));
+    }
+    return api.get('/auth/users');
+  },
 };
 
 export const workHourAPI = {
-  getWorkHours: (params) => api.get('/work-hours', { params }),
-  getWorkHour: (id) => api.get(`/work-hours/${id}`),
-  createWorkHour: (data) => api.post('/work-hours', data),
-  updateWorkHour: (id, data) => api.put(`/work-hours/${id}`, data),
-  deleteWorkHour: (id) => api.delete(`/work-hours/${id}`),
-  submitWorkHour: (id) => api.post(`/work-hours/${id}/submit`),
-  getPendingApprovals: () => api.get('/work-hours/pending-approvals'),
-  approveWorkHour: (id) => api.post(`/work-hours/${id}/approve`),
-  rejectWorkHour: (id) => api.post(`/work-hours/${id}/reject`),
+  getWorkHours: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        let result = [...mockWorkHours];
+        if (params?.personCode) {
+          result = result.filter(w => w.personCode === params.personCode);
+        }
+        if (params?.status) {
+          result = result.filter(w => w.status === params.status);
+        }
+        return {
+          data: {
+            code: 200,
+            data: result,
+          },
+        };
+      });
+    }
+    return api.get('/work-hours', { params });
+  },
+  getWorkHour: (id) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockWorkHours.find(w => w.id === id),
+        },
+      }));
+    }
+    return api.get(`/work-hours/${id}`);
+  },
+  createWorkHour: (data) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const project = mockProjects.find(p => p.projectCode === data.projectCode);
+        const newWorkHour = {
+          id: nextWorkHourId++,
+          ...data,
+          personCode: user.personCode,
+          personName: user.name,
+          projectName: project?.projectName || data.projectCode,
+          status: 'Pending',
+          createTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
+        };
+        mockWorkHours.push(newWorkHour);
+        return {
+          data: {
+            code: 200,
+            data: newWorkHour,
+            message: '创建成功',
+          },
+        };
+      });
+    }
+    return api.post('/work-hours', data);
+  },
+  updateWorkHour: (id, data) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const index = mockWorkHours.findIndex(w => w.id === id);
+        if (index >= 0) {
+          const project = mockProjects.find(p => p.projectCode === data.projectCode);
+          mockWorkHours[index] = {
+            ...mockWorkHours[index],
+            ...data,
+            projectName: project?.projectName || data.projectCode,
+          };
+          return {
+            data: {
+              code: 200,
+              data: mockWorkHours[index],
+              message: '更新成功',
+            },
+          };
+        }
+        return {
+          data: {
+            code: 404,
+            message: '记录不存在',
+          },
+        };
+      });
+    }
+    return api.put(`/work-hours/${id}`, data);
+  },
+  deleteWorkHour: (id) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        mockWorkHours = mockWorkHours.filter(w => w.id !== id);
+        return {
+          data: {
+            code: 200,
+            message: '删除成功',
+          },
+        };
+      });
+    }
+    return api.delete(`/work-hours/${id}`);
+  },
+  submitWorkHour: (id) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const index = mockWorkHours.findIndex(w => w.id === id);
+        if (index >= 0) {
+          mockWorkHours[index].status = 'Submitted';
+          return {
+            data: {
+              code: 200,
+              message: '提交成功',
+            },
+          };
+        }
+        return {
+          data: {
+            code: 404,
+            message: '记录不存在',
+          },
+        };
+      });
+    }
+    return api.post(`/work-hours/${id}/submit`);
+  },
+  getPendingApprovals: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockWorkHours.filter(w => w.status === 'Submitted'),
+        },
+      }));
+    }
+    return api.get('/work-hours/pending-approvals');
+  },
+  approveWorkHour: (id) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const index = mockWorkHours.findIndex(w => w.id === id);
+        if (index >= 0) {
+          mockWorkHours[index].status = 'Approved';
+          return {
+            data: {
+              code: 200,
+              message: '审批通过',
+            },
+          };
+        }
+        return {
+          data: {
+            code: 404,
+            message: '记录不存在',
+          },
+        };
+      });
+    }
+    return api.post(`/work-hours/${id}/approve`);
+  },
+  rejectWorkHour: (id) => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const index = mockWorkHours.findIndex(w => w.id === id);
+        if (index >= 0) {
+          mockWorkHours[index].status = 'Rejected';
+          return {
+            data: {
+              code: 200,
+              message: '已驳回',
+            },
+          };
+        }
+        return {
+          data: {
+            code: 404,
+            message: '记录不存在',
+          },
+        };
+      });
+    }
+    return api.post(`/work-hours/${id}/reject`);
+  },
 };
 
 export const basicDataAPI = {
-  getCurrentUser: () => api.get('/persons/mine'),
-  getPersons: () => api.get('/persons'),
-  getMyProjects: () => api.get('/projects/my'),
-  getAllProjects: () => api.get('/projects/all'),
-  getMyAttendance: (params) => api.get('/attendance/my', { params }),
-  getDeptAttendance: (params) => api.get('/attendance/dept', { params }),
-  getPendingOaProcesses: () => api.get('/oa-processes/pending'),
-  simulateOaProcess: (data) => api.post('/oa-processes/simulate', data),
+  getCurrentUser: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        return {
+          data: {
+            code: 200,
+            data: user,
+          },
+        };
+      });
+    }
+    return api.get('/persons/mine');
+  },
+  getPersons: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockUsers,
+        },
+      }));
+    }
+    return api.get('/persons');
+  },
+  getMyProjects: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockProjects,
+        },
+      }));
+    }
+    return api.get('/projects/my');
+  },
+  getAllProjects: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockProjects,
+        },
+      }));
+    }
+    return api.get('/projects/all');
+  },
+  getMyAttendance: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: [
+            { date: '2026-04-28', checkIn: '08:30', checkOut: '18:00', status: '正常' },
+            { date: '2026-04-27', checkIn: '08:45', checkOut: '18:30', status: '正常' },
+            { date: '2026-04-26', checkIn: '09:00', checkOut: '18:00', status: '迟到' },
+          ],
+        },
+      }));
+    }
+    return api.get('/attendance/my', { params });
+  },
+  getDeptAttendance: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: [],
+        },
+      }));
+    }
+    return api.get('/attendance/dept', { params });
+  },
+  getPendingOaProcesses: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: [],
+        },
+      }));
+    }
+    return api.get('/oa-processes/pending');
+  },
+  simulateOaProcess: (data) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          message: '模拟成功',
+        },
+      }));
+    }
+    return api.post('/oa-processes/simulate', data);
+  },
 };
 
 export const statisticsAPI = {
-  getPersonalStatistics: (params) => api.get('/statistics/personal', { params }),
-  getDepartmentStatistics: (params) => api.get('/statistics/department', { params }),
-  getProjectStatistics: (code, params) => api.get(`/statistics/project/${code}`, { params }),
+  getPersonalStatistics: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: {
+            totalHours: 168,
+            projectCount: 5,
+            avgHoursPerDay: 7.5,
+            monthlyData: [
+              { month: '2026-01', hours: 176 },
+              { month: '2026-02', hours: 160 },
+              { month: '2026-03', hours: 184 },
+              { month: '2026-04', hours: 168 },
+            ],
+            projectDistribution: [
+              { projectCode: 'PRJ001', projectName: '智能工厂系统', hours: 64 },
+              { projectCode: 'PRJ002', projectName: '数据中台项目', hours: 48 },
+              { projectCode: 'PRJ003', projectName: '移动办公平台', hours: 32 },
+              { projectCode: 'PRJ004', projectName: '智慧城市项目', hours: 24 },
+            ],
+          },
+        },
+      }));
+    }
+    return api.get('/statistics/personal', { params });
+  },
+  getDepartmentStatistics: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: {
+            totalHours: 1680,
+            memberCount: 10,
+            avgHoursPerPerson: 168,
+            memberData: [
+              { personCode: 'EMP001', personName: '张三', hours: 168 },
+              { personCode: 'EMP002', personName: '李四', hours: 176 },
+              { personCode: 'EMP003', personName: '王五', hours: 160 },
+            ],
+          },
+        },
+      }));
+    }
+    return api.get('/statistics/department', { params });
+  },
+  getProjectStatistics: (code, params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: {
+            totalHours: 320,
+            memberCount: 4,
+            avgHoursPerPerson: 80,
+            memberData: [
+              { personCode: 'EMP001', personName: '张三', hours: 80 },
+              { personCode: 'EMP002', personName: '李四', hours: 80 },
+              { personCode: 'EMP003', personName: '王五', hours: 80 },
+              { personCode: 'EMP004', personName: '赵六', hours: 80 },
+            ],
+          },
+        },
+      }));
+    }
+    return api.get(`/statistics/project/${code}`, { params });
+  },
+};
+
+export const syncAPI = {
+  getStatus: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: {
+            isRunning: false,
+            lastSyncTime: '2026-04-29 08:00:00',
+            nextSyncTime: '2026-04-29 09:00:00',
+            syncInterval: 60,
+            totalRecords: 1256,
+            lastSyncStatus: '成功',
+          },
+        },
+      }));
+    }
+    return api.get('/sync/status');
+  },
+  manualSync: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => {
+        const newLog = {
+          id: mockSyncLogs.length + 1,
+          syncTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
+          syncType: '手动同步',
+          status: '成功',
+          recordCount: Math.floor(Math.random() * 100) + 50,
+          duration: `${(Math.random() * 2 + 1).toFixed(1)}s`,
+        };
+        mockSyncLogs.unshift(newLog);
+        return {
+          data: {
+            code: 200,
+            message: '同步成功',
+            data: newLog,
+          },
+        };
+      });
+    }
+    return api.post('/sync/manual');
+  },
+  getLogs: (params) => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockSyncLogs.slice(0, params?.limit || 20),
+        },
+      }));
+    }
+    return api.get('/sync/logs', { params });
+  },
+  getStatistics: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: {
+            totalSyncs: 156,
+            successCount: 152,
+            failedCount: 4,
+            totalRecords: 12560,
+            avgDuration: '2.1s',
+          },
+        },
+      }));
+    }
+    return api.get('/sync/statistics');
+  },
 };
 
 export default api;
