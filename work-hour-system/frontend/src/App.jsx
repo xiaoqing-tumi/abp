@@ -18,16 +18,15 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const pathname = window.location.pathname;
     
-    if (pathname === '/login') {
+    if (pathname.includes('login') || !token) {
       setShowLogin(true);
-      return;
-    }
-    
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setShowLogin(true);
+      if (token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
   }, []);
 
@@ -39,7 +38,7 @@ function App() {
     logout();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    window.location.href = '/?login';
   };
 
   const renderContent = () => {
