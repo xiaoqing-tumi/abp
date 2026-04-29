@@ -13,25 +13,33 @@ import { useAuth } from './stores/authStore';
 import './App.css';
 
 function App() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('workhour');
   const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
     const pathname = window.location.pathname;
     
-    if (!token && pathname !== '/login') {
+    if (pathname === '/login') {
       setShowLogin(true);
-    } else if (token && pathname === '/login') {
-      window.location.href = '/';
-    } else if (!token && pathname === '/login') {
+      return;
+    }
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
       setShowLogin(true);
     }
   }, []);
 
   const handleLoginSuccess = () => {
     window.location.href = '/';
+  };
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
   };
 
   const renderContent = () => {
@@ -53,7 +61,7 @@ function App() {
     }
   };
 
-  if (showLogin || !isLoggedIn()) {
+  if (showLogin) {
     return (
       <ConfigProvider locale={zhCN}>
         <Login onLoginSuccess={handleLoginSuccess} />
@@ -63,7 +71,11 @@ function App() {
 
   return (
     <ConfigProvider locale={zhCN}>
-      <CustomLayout currentPage={currentPage} onPageChange={setCurrentPage}>
+      <CustomLayout 
+        currentPage={currentPage} 
+        onPageChange={setCurrentPage}
+        onLogout={handleLogout}
+      >
         {renderContent()}
       </CustomLayout>
     </ConfigProvider>
