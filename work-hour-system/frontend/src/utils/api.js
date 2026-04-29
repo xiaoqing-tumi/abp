@@ -638,4 +638,29 @@ export const syncAPI = {
   },
 };
 
+export const projectAPI = {
+  getProjects: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockProjects.filter(p => p.status === 1),
+        },
+      }));
+    }
+    return api.get('/projects/my');
+  },
+  getAllProjects: () => {
+    if (USE_MOCK) {
+      return mockRequest(() => ({
+        data: {
+          code: 200,
+          data: mockProjects,
+        },
+      }));
+    }
+    return api.get('/projects/all');
+  },
+};
+
 export default api;
