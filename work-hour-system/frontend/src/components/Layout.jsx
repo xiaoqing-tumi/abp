@@ -158,30 +158,6 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
             menu={{ 
               items: [
                 {
-                  key: 'profile',
-                  icon: <UserOutlined />,
-                  label: (
-                    <div style={{ padding: '8px 12px' }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: '#1f1f1f', marginBottom: 4 }}>
-                        {user?.name}
-                      </div>
-                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-                        {user?.role === 'Admin' && '管理员'}
-                        {user?.role === 'Director' && '高管'}
-                        {user?.role === 'DeptManager' && '部门经理'}
-                        {user?.role === 'PM' && '项目经理'}
-                        {user?.role === 'HRAttendance' && 'HR专员'}
-                        {user?.role === 'Employee' && '普通员工'}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#bfbfbf', marginTop: 4 }}>
-                        {user?.email}
-                      </div>
-                    </div>
-                  ),
-                  onClick: () => {},
-                },
-                { type: 'divider' },
-                {
                   key: 'logout',
                   icon: <LogoutOutlined />,
                   label: '退出登录',
@@ -194,53 +170,48 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
             }}
             placement="bottomRight"
             overlayStyle={{
-              width: 280,
-              borderRadius: 12,
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.12)',
-              border: 'none',
-              padding: 0,
+              borderRadius: 8,
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
+              border: '1px solid #f0f0f0',
+              padding: 4,
             }}
           >
             <div
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                gap: 12,
-                padding: '6px 12px',
-                borderRadius: 20,
+                gap: 4,
+                padding: '8px 12px',
+                borderRadius: 8,
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
+                minWidth: 60,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f0f5ff';
+                e.currentTarget.style.background = '#f5f5f5';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
               <Avatar 
-                size={32} 
-                icon={<UserOutlined style={{ fontSize: 16 }} />}
+                size={36} 
+                icon={<UserOutlined style={{ fontSize: 18 }} />}
                 style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: '2px solid #fff',
-                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
+                  background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                  border: '2px solid #ffffff',
+                  boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
                 }}
               />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: '#262626' }}>
-                  {user?.name}
-                </div>
-                <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-                  {user?.role === 'Admin' && '管理员'}
-                  {user?.role === 'Director' && '高管'}
-                  {user?.role === 'DeptManager' && '部门经理'}
-                  {user?.role === 'PM' && '项目经理'}
-                  {user?.role === 'HRAttendance' && 'HR专员'}
-                  {user?.role === 'Employee' && '普通员工'}
-                </div>
+              <div style={{ fontSize: 11, color: '#666666', fontWeight: 500 }}>
+                {user?.role === 'Admin' && '管理员'}
+                {user?.role === 'Director' && '高管'}
+                {user?.role === 'DeptManager' && '部门经理'}
+                {user?.role === 'PM' && '项目经理'}
+                {user?.role === 'HRAttendance' && 'HR专员'}
+                {user?.role === 'Employee' && '普通员工'}
               </div>
-              <MoreOutlined style={{ fontSize: 14, color: '#bfbfbf' }} />
             </div>
           </Dropdown>
         </Header>
