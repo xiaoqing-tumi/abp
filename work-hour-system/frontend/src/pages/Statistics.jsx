@@ -130,16 +130,24 @@ const Statistics = ({ onPageChange }) => {
                 borderRadius: 6,
                 border: '1px solid #f0f0f0',
                 boxShadow: 'none',
+                cursor: 'pointer',
               }}
+              hoverable
+              onClick={() => onPageChange && onPageChange('history')}
             >
-              <Statistic
-                title="总工时"
-                value={personalStats.totalHours || 0}
-                suffix="小时"
-                prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
-                valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
-                loading={loading}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <Statistic
+                    title="总工时"
+                    value={personalStats.totalHours || 0}
+                    suffix="小时"
+                    prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
+                    valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
+                    loading={loading}
+                  />
+                </div>
+                <div style={{ color: '#1890ff', fontSize: 12, marginRight: 8 }}>点击查看详情 →</div>
+              </div>
             </Card>
           </Col>
           <Col span={6}>
@@ -148,16 +156,24 @@ const Statistics = ({ onPageChange }) => {
                 borderRadius: 6,
                 border: '1px solid #f0f0f0',
                 boxShadow: 'none',
+                cursor: 'pointer',
               }}
+              hoverable
+              onClick={() => onPageChange && onPageChange('history')}
             >
-              <Statistic
-                title="正常工时"
-                value={personalStats.normalHours || 0}
-                suffix="小时"
-                prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
-                valueStyle={{ color: '#52c41a', fontSize: 24, fontWeight: 600 }}
-                loading={loading}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <Statistic
+                    title="正常工时"
+                    value={personalStats.normalHours || 0}
+                    suffix="小时"
+                    prefix={<BarChartOutlined style={{ color: '#52c41a' }} />}
+                    valueStyle={{ color: '#52c41a', fontSize: 24, fontWeight: 600 }}
+                    loading={loading}
+                  />
+                </div>
+                <div style={{ color: '#52c41a', fontSize: 12, marginRight: 8 }}>点击查看详情 →</div>
+              </div>
             </Card>
           </Col>
           <Col span={6}>

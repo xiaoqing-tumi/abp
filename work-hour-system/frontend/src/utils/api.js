@@ -6,36 +6,26 @@ const USE_MOCK = true;
 const mockUsers = [
   { personCode: 'EMP001', name: '张三', departmentId: 'TECH', departmentName: '技术部', role: 'Employee', status: 1, email: 'zhangsan@company.com' },
   { personCode: 'EMP002', name: '李四', departmentId: 'TECH', departmentName: '技术部', role: 'Employee', status: 1, email: 'lisi@company.com' },
-  { personCode: 'EMP003', name: '王五', departmentId: 'TECH', departmentName: '技术部', role: 'Employee', status: 1, email: 'wangwu@company.com' },
-  { personCode: 'EMP004', name: '赵六', departmentId: 'PROD', departmentName: '产品部', role: 'Employee', status: 1, email: 'zhaoliu@company.com' },
-  { personCode: 'EMP005', name: '钱七', departmentId: 'MKT', departmentName: '市场部', role: 'Employee', status: 1, email: 'qianqi@company.com' },
   { personCode: 'MGR001', name: '王经理', departmentId: 'TECH', departmentName: '技术部', role: 'DeptManager', status: 1, email: 'wang.manager@company.com' },
-  { personCode: 'PM001', name: '李项目经理', departmentId: 'TECH', departmentName: '技术部', role: 'PM', status: 1, email: 'li.pm@company.com' },
-  { personCode: 'HR001', name: '张HR', departmentId: 'HR', departmentName: '人力资源部', role: 'HRAttendance', status: 1, email: 'zhang.hr@company.com' },
+  { personCode: 'MGR002', name: '李项目经理', departmentId: 'TECH', departmentName: '技术部', role: 'PM', status: 1, email: 'li.pm@company.com' },
   { personCode: 'ADMIN', name: '系统管理员', departmentId: 'HR', departmentName: '人力资源部', role: 'Admin', status: 1, email: 'admin@company.com' },
 ];
 
 const mockProjects = [
-  { projectCode: 'PRJ001', projectName: '智能工厂系统', customerName: '华为科技', managerCode: 'PM001', managerName: '李项目经理', status: 1, startDate: '2026-01-01', endDate: '2026-12-31' },
-  { projectCode: 'PRJ002', projectName: '数据中台项目', customerName: '阿里巴巴', managerCode: 'PM001', managerName: '李项目经理', status: 1, startDate: '2026-02-01', endDate: '2026-11-30' },
-  { projectCode: 'PRJ003', projectName: '移动办公平台', customerName: '腾讯科技', managerCode: 'PM001', managerName: '李项目经理', status: 1, startDate: '2026-03-01', endDate: '2026-10-31' },
+  { projectCode: 'PRJ001', projectName: '智能工厂系统', customerName: '华为科技', managerCode: 'MGR002', managerName: '李项目经理', status: 1, startDate: '2026-01-01', endDate: '2026-12-31' },
+  { projectCode: 'PRJ002', projectName: '数据中台项目', customerName: '阿里巴巴', managerCode: 'MGR002', managerName: '李项目经理', status: 1, startDate: '2026-02-01', endDate: '2026-11-30' },
+  { projectCode: 'PRJ003', projectName: '移动办公平台', customerName: '腾讯科技', managerCode: 'MGR001', managerName: '王经理', status: 1, startDate: '2026-03-01', endDate: '2026-10-31' },
   { projectCode: 'PRJ004', projectName: '智慧城市项目', customerName: '政府单位', managerCode: 'MGR001', managerName: '王经理', status: 1, startDate: '2026-04-01', endDate: '2027-03-31' },
-  { projectCode: 'PRJ005', projectName: '电商平台升级', customerName: '京东集团', managerCode: 'MGR001', managerName: '王经理', status: 0, startDate: '2025-06-01', endDate: '2026-03-31' },
 ];
 
 let mockWorkHours = [
   { id: 1, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '系统功能开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00' },
   { id: 2, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 2, workContent: '线上问题修复', workType: 'overtime', status: 'Submitted', createTime: '2026-04-28 20:00:00', submitTime: '2026-04-28 21:00:00' },
   { id: 3, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-27', workHours: 8, workContent: '数据接口对接', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 4, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00' },
-  { id: 5, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 6, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00' },
-  { id: 7, personCode: 'EMP003', personName: '王五', projectCode: 'PRJ002', projectName: '数据中台项目', workDate: '2026-04-28', workHours: 8, workContent: '数据分析报告', workType: 'normal', status: 'Pending', createTime: '2026-04-28 09:30:00' },
-  { id: 8, personCode: 'EMP003', personName: '王五', projectCode: 'PRJ004', projectName: '智慧城市项目', workDate: '2026-04-27', workHours: 4, workContent: '需求调研', workType: 'normal', status: 'Submitted', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
-  { id: 9, personCode: 'EMP003', personName: '王五', projectCode: 'PRJ004', projectName: '智慧城市项目', workDate: '2026-04-27', workHours: 4, workContent: '方案设计', workType: 'overtime', status: 'Submitted', createTime: '2026-04-27 18:00:00', submitTime: '2026-04-27 22:00:00' },
-  { id: 10, personCode: 'EMP004', personName: '赵六', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-28', workHours: 8, workContent: '产品需求分析', workType: 'normal', status: 'Pending', createTime: '2026-04-28 09:00:00' },
-  { id: 11, personCode: 'EMP005', personName: '钱七', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 8, workContent: '市场推广文案', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 09:00:00', submitTime: '2026-04-28 18:00:00' },
-  { id: 12, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00' },
+  { id: 4, personCode: 'EMP001', personName: '张三', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-25', workHours: 8, workContent: '需求分析', workType: 'normal', status: 'Rejected', createTime: '2026-04-25 09:00:00', submitTime: '2026-04-25 18:00:00' },
+  { id: 5, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ001', projectName: '智能工厂系统', workDate: '2026-04-28', workHours: 6, workContent: '前端页面开发', workType: 'normal', status: 'Submitted', createTime: '2026-04-28 10:00:00', submitTime: '2026-04-28 18:30:00' },
+  { id: 6, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-27', workHours: 8, workContent: 'APP功能测试', workType: 'normal', status: 'Approved', createTime: '2026-04-27 09:00:00', submitTime: '2026-04-27 18:00:00' },
+  { id: 7, personCode: 'EMP002', personName: '李四', projectCode: 'PRJ003', projectName: '移动办公平台', workDate: '2026-04-26', workHours: 3, workContent: '紧急bug修复', workType: 'overtime', status: 'Approved', createTime: '2026-04-26 18:00:00', submitTime: '2026-04-26 21:30:00' },
 ];
 
 let mockSyncLogs = [
@@ -46,7 +36,7 @@ let mockSyncLogs = [
   { id: 5, syncTime: '2026-04-27 20:00:00', syncType: '自动同步', status: '失败', recordCount: 0, duration: '0.5s', errorMessage: '网络连接超时' },
 ];
 
-let nextWorkHourId = 13;
+let nextWorkHourId = 8;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -136,6 +126,9 @@ export const workHourAPI = {
         }
         if (params?.status) {
           result = result.filter(w => w.status === params.status);
+        }
+        if (params?.workType) {
+          result = result.filter(w => w.workType === params.workType);
         }
         return {
           data: {

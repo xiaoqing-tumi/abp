@@ -1,42 +1,34 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Table, Button, DatePicker, Select, Card, Row, Col, message, Modal, Form, Input, InputNumber, Checkbox, Dropdown, Tag } from 'antd';
-import { EditOutlined, DeleteOutlined, SendOutlined, EyeOutlined, SearchOutlined, FilterOutlined, ColumnWidthOutlined, CheckCircleOutlined, CloseCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { Table, Button, DatePicker, Card, Row, Col, message, Tag } from 'antd';
+import { ClockCircleOutlined, UserOutlined, CalendarOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
 const { RangePicker } = DatePicker;
-const { Option } = Select;
-const { TextArea } = Input;
 
-const WorkHourList = () => {
+const WorkHourList = ({ type }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [dateRange, setDateRange] = useState([dayjs().subtract(7, 'day'), dayjs()]);
-  const [statusFilter, setStatusFilter] = useState('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [form] = Form.useForm();
-  const [visibleColumns, setVisibleColumns] = useState({
-    workDate: true,
-    projectName: true,
-    workHours: true,
-    status: true,
-    workContent: true,
-    actions: true,
-  });
+  const [dateRange, setDateRange] = useState([dayjs().subtract(30, 'day'), dayjs()]);
+
+  const pageTitle = useMemo(() => {
+    if (type === 'overtime') return '加班记录';
+    return '工时记录';
+  }, [type]);
 
   useEffect(() => {
     fetchWorkHours();
-  }, [dateRange, statusFilter]);
+  }, [dateRange, type]);
 
   const fetchWorkHours = async () => {
     setLoading(true);
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await workHourAPI.getWorkHours({
-        personCode: user.personCode,
-        status: statusFilter || undefined,
-      });
+      const params = { personCode: user.personCode };
+      if (type === 'overtime') {
+        params.workType = 'overtime';
+      }
+      const response = await workHourAPI.getWorkHours(params);
       if (response.data.code === 200) {
         let result = response.data.data;
         if (dateRange && dateRange[0] && dateRange[1]) {
@@ -56,98 +48,6 @@ const WorkHourList = () => {
     }
   };
 
-  const handleEdit = (record) => {
-    if (record.status !== 'Pending' && record.status !== 'Rejected') {
-      message.warning('只能编辑待提交或已驳回状态的工时记录');
-      return;
-    }
-    setEditingItem(record);
-    form.setFieldsValue({
-      workHours: record.workHours,
-      workContent: record.workContent,
-    });
-    setIsModalVisible(true);
-  };
-
-  const handleView = (record) => {
-    setEditingItem(record);
-    form.setFieldsValue({
-      workHours: record.workHours,
-      workContent: record.workContent,
-    });
-    setIsModalVisible(true);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      const response = await workHourAPI.deleteWorkHour(id);
-      if (response.data.code === 200) {
-        message.success('删除成功');
-        fetchWorkHours();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || '删除失败');
-    }
-  };
-
-  const handleSubmit = async (id) => {
-    try {
-      const response = await workHourAPI.submitWorkHour(id);
-      if (response.data.code === 200) {
-        message.success('提交成功');
-        fetchWorkHours();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || '提交失败');
-    }
-  };
-
-  const handleResubmit = async (id) => {
-    try {
-      const response = await workHourAPI.updateWorkHour(id, { status: 'Pending' });
-      if (response.data.code === 200) {
-        message.success('已转为待提交状态，可以重新编辑并提交');
-        fetchWorkHours();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || '操作失败');
-    }
-  };
-
-  const handleSaveEdit = async (values) => {
-    try {
-      const response = await workHourAPI.updateWorkHour(editingItem.id, {
-        workHours: values.workHours,
-        workContent: values.workContent,
-        status: 'Pending',
-      });
-      if (response.data.code === 200) {
-        message.success('修改成功，已转为待提交状态');
-        setIsModalVisible(false);
-        fetchWorkHours();
-      } else {
-        message.error(response.data.message);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || '修改失败');
-    }
-  };
-
-  const allColumns = [
-    { key: 'workDate', title: '日期' },
-    { key: 'projectName', title: '项目' },
-    { key: 'workHours', title: '工时(小时)' },
-    { key: 'status', title: '状态' },
-    { key: 'workContent', title: '工作内容' },
-    { key: 'actions', title: '操作' },
-  ];
-
   const statusMap = {
     Pending: { label: '待提交', color: 'default' },
     Submitted: { label: '已提交', color: 'processing' },
@@ -155,146 +55,89 @@ const WorkHourList = () => {
     Rejected: { label: '已驳回', color: 'error' },
   };
 
-  const columns = useMemo(() => {
-    const result = [];
-    if (visibleColumns.workDate) {
-      result.push({
-        title: '日期',
-        dataIndex: 'workDate',
-        key: 'workDate',
-        width: 120,
-        render: (text) => dayjs(text).format('YYYY-MM-DD'),
-      });
-    }
-    if (visibleColumns.projectName) {
-      result.push({
-        title: '项目',
-        dataIndex: 'projectName',
-        key: 'projectName',
-        ellipsis: true,
-        width: 180,
-      });
-    }
-    if (visibleColumns.workHours) {
-      result.push({
-        title: '工时(小时)',
-        dataIndex: 'workHours',
-        key: 'workHours',
-        width: 100,
-      });
-    }
-    if (visibleColumns.status) {
-      result.push({
-        title: '状态',
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        render: (text) => {
-          const status = statusMap[text] || { label: text, color: 'default' };
-          return <Tag color={status.color}>{status.label}</Tag>;
-        },
-      });
-    }
-    if (visibleColumns.workContent) {
-      result.push({
-        title: '工作内容',
-        dataIndex: 'workContent',
-        key: 'workContent',
-        ellipsis: true,
-        width: 200,
-      });
-    }
-    if (visibleColumns.actions) {
-      result.push({
-        title: '操作',
-        key: 'actions',
-        width: 250,
-        render: (_, record) => (
-          <div style={{ display: 'flex', gap: 8 }}>
-            {record.status === 'Pending' && (
-              <>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => handleEdit(record)}
-                >
-                  编辑
-                </Button>
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleDelete(record.id)}
-                >
-                  删除
-                </Button>
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<SendOutlined />}
-                  onClick={() => handleSubmit(record.id)}
-                >
-                  提交
-                </Button>
-              </>
-            )}
-            {record.status === 'Rejected' && (
-              <>
-                <Button
-                  type="text"
-                  size="small"
-                  icon={<EditOutlined />}
-                  onClick={() => handleEdit(record)}
-                >
-                  重新编辑
-                </Button>
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<SyncOutlined />}
-                  onClick={() => handleResubmit(record.id)}
-                >
-                  重新提交
-                </Button>
-              </>
-            )}
-            {(record.status === 'Submitted' || record.status === 'Approved') && (
-              <Button
-                type="text"
-                size="small"
-                icon={<EyeOutlined />}
-                onClick={() => handleView(record)}
-              >
-                查看
-              </Button>
-            )}
-          </div>
-        ),
-      });
-    }
-    return result;
-  }, [visibleColumns]);
+  const columns = [
+    {
+      title: '日期',
+      dataIndex: 'workDate',
+      key: 'workDate',
+      width: 120,
+      render: (text) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <CalendarOutlined style={{ color: '#1890ff' }} />
+          {dayjs(text).format('YYYY-MM-DD')}
+        </div>
+      ),
+    },
+    {
+      title: '项目',
+      dataIndex: 'projectName',
+      key: 'projectName',
+      ellipsis: true,
+      width: 180,
+    },
+    {
+      title: '工时',
+      dataIndex: 'workHours',
+      key: 'workHours',
+      width: 100,
+      render: (text, record) => (
+        <div style={{ color: record.workType === 'overtime' ? '#fa8c16' : '#52c41a', fontWeight: 600, fontSize: 15 }}>
+          {text} 小时
+        </div>
+      ),
+    },
+    {
+      title: '类型',
+      dataIndex: 'workType',
+      key: 'workType',
+      width: 100,
+      render: (text) => (
+        <Tag color={text === 'overtime' ? 'orange' : 'green'}>
+          {text === 'overtime' ? '加班' : '正常'}
+        </Tag>
+      ),
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (text) => {
+        const status = statusMap[text] || { label: text, color: 'default' };
+        return <Tag color={status.color}>{status.label}</Tag>;
+      },
+    },
+    {
+      title: '工作内容',
+      dataIndex: 'workContent',
+      key: 'workContent',
+      ellipsis: true,
+      width: 250,
+    },
+    {
+      title: '提交时间',
+      dataIndex: 'submitTime',
+      key: 'submitTime',
+      width: 160,
+      render: (text) => text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-',
+    },
+  ];
 
-  const handleColumnToggle = (columnKey) => {
-    setVisibleColumns((prev) => ({
-      ...prev,
-      [columnKey]: !prev[columnKey],
-    }));
-  };
+  const totalHours = useMemo(() => {
+    return data.reduce((sum, item) => sum + (item.workHours || 0), 0).toFixed(1);
+  }, [data]);
 
-  const columnMenuItems = allColumns.map((col) => ({
-    key: col.key,
-    label: (
-      <Checkbox
-        checked={visibleColumns[col.key]}
-        onChange={() => handleColumnToggle(col.key)}
-      >
-        {col.title}
-      </Checkbox>
-    ),
-  }));
+  const normalHours = useMemo(() => {
+    return data.filter(w => !w.workType || w.workType === 'normal').reduce((sum, item) => sum + (item.workHours || 0), 0).toFixed(1);
+  }, [data]);
+
+  const overtimeHours = useMemo(() => {
+    return data.filter(w => w.workType === 'overtime').reduce((sum, item) => sum + (item.workHours || 0), 0).toFixed(1);
+  }, [data]);
+
+  const approvedCount = useMemo(() => {
+    return data.filter(item => item.status === 'Approved').length;
+  }, [data]);
 
   return (
     <Card
@@ -305,36 +148,101 @@ const WorkHourList = () => {
       }}
     >
       <Row gutter={16} style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ClockCircleOutlined style={{ color: '#1890ff', fontSize: 20 }} />
+          <span style={{ fontWeight: 600, fontSize: 16 }}>{pageTitle}</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <SearchOutlined style={{ color: '#999' }} />
+            <FilterOutlined style={{ color: '#999' }} />
             <RangePicker
               value={dateRange}
               onChange={(dates) => setDateRange(dates)}
               style={{ width: 280 }}
             />
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <FilterOutlined style={{ color: '#999' }} />
-            <Select
-              placeholder="全部"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 120 }}
-            >
-              <Option value="">全部</Option>
-              <Option value="Pending">待提交</Option>
-              <Option value="Submitted">已提交</Option>
-              <Option value="Approved">已审批</Option>
-              <Option value="Rejected">已驳回</Option>
-            </Select>
-          </div>
         </div>
-        <Dropdown menu={{ items: columnMenuItems }} trigger={['click']}>
-          <Button type="default" icon={<ColumnWidthOutlined />}>
-            列设置
-          </Button>
-        </Dropdown>
+      </Row>
+
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col span={6}>
+          <Card
+            style={{
+              borderRadius: 6,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, background: '#e6f7ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ClockCircleOutlined style={{ color: '#1890ff', fontSize: 20 }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#999' }}>总工时</div>
+                <div style={{ fontSize: 24, fontWeight: 600, color: '#1890ff' }}>{totalHours}小时</div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        {type !== 'overtime' && (
+          <Col span={6}>
+            <Card
+              style={{
+                borderRadius: 6,
+                border: '1px solid #f0f0f0',
+                boxShadow: 'none',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, background: '#f6ffed', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <UserOutlined style={{ color: '#52c41a', fontSize: 20 }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 12, color: '#999' }}>正常工时</div>
+                  <div style={{ fontSize: 24, fontWeight: 600, color: '#52c41a' }}>{normalHours}小时</div>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        )}
+        <Col span={6}>
+          <Card
+            style={{
+              borderRadius: 6,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, background: '#fff7e6', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <SearchOutlined style={{ color: '#fa8c16', fontSize: 20 }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#999' }}>加班工时</div>
+                <div style={{ fontSize: 24, fontWeight: 600, color: '#fa8c16' }}>{overtimeHours}小时</div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card
+            style={{
+              borderRadius: 6,
+              border: '1px solid #f0f0f0',
+              boxShadow: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 40, height: 40, background: '#f9f0ff', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <SearchOutlined style={{ color: '#722ed1', fontSize: 20 }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, color: '#999' }}>已审批</div>
+                <div style={{ fontSize: 24, fontWeight: 600, color: '#722ed1' }}>{approvedCount}条</div>
+              </div>
+            </div>
+          </Card>
+        </Col>
       </Row>
 
       <Table
@@ -351,44 +259,6 @@ const WorkHourList = () => {
         scroll={{ x: 'max-content' }}
         style={{ background: '#fff' }}
       />
-
-      <Modal
-        title={editingItem?.status === 'Rejected' ? '重新编辑工时' : editingItem?.status === 'Pending' ? '编辑工时' : '查看工时'}
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected') ? null : <Button onClick={() => setIsModalVisible(false)}>关闭</Button>}
-      >
-        <Form
-          form={form}
-          onFinish={handleSaveEdit}
-          layout="vertical"
-        >
-          <Form.Item
-            label="工时"
-            name="workHours"
-            rules={[{ required: true, message: '请输入工时' }]}
-          >
-            <InputNumber
-              min={0.5}
-              max={editingItem?.workType === 'overtime' ? 12 : 8}
-              step={0.5}
-              style={{ width: '100%' }}
-              suffix="小时"
-              disabled={!(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected')}
-            />
-          </Form.Item>
-          <Form.Item label="工作内容" name="workContent">
-            <TextArea rows={3} disabled={!(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected')} />
-          </Form.Item>
-          {(editingItem?.status === 'Pending' || editingItem?.status === 'Rejected') && (
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                {editingItem?.status === 'Rejected' ? '保存并转为待提交' : '保存修改'}
-              </Button>
-            </Form.Item>
-          )}
-        </Form>
-      </Modal>
     </Card>
   );
 };

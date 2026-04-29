@@ -8,7 +8,6 @@ import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
 import AdminPanel from './pages/AdminPanel';
 import DataSync from './pages/DataSync';
-import OvertimeList from './pages/OvertimeList';
 import CustomLayout from './components/Layout';
 import { useAuth } from './stores/authStore';
 import './App.css';
@@ -16,6 +15,7 @@ import './App.css';
 function App() {
   const { isLoggedIn, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('workhour');
+  const [listType, setListType] = useState(null);
   const [showLogin, setShowLogin] = useState(true);
 
   useEffect(() => {
@@ -39,22 +39,33 @@ function App() {
     window.location.href = '/';
   };
 
+  const handlePageChange = (page) => {
+    if (page === 'overtime') {
+      setListType('overtime');
+      setCurrentPage('history');
+    } else if (page === 'history') {
+      setListType(null);
+      setCurrentPage('history');
+    } else {
+      setListType(null);
+      setCurrentPage(page);
+    }
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case 'workhour':
         return <WorkHourForm workDate={new Date()} onSubmit={() => {}} />;
       case 'history':
-        return <WorkHourList />;
+        return <WorkHourList type={listType} />;
       case 'approval':
         return <ApprovalList />;
       case 'statistics':
-        return <Statistics onPageChange={setCurrentPage} />;
+        return <Statistics onPageChange={handlePageChange} />;
       case 'admin':
         return <AdminPanel />;
       case 'sync':
         return <DataSync />;
-      case 'overtime':
-        return <OvertimeList />;
       default:
         return <WorkHourForm workDate={new Date()} onSubmit={() => {}} />;
     }
@@ -72,7 +83,7 @@ function App() {
     <ConfigProvider locale={zhCN}>
       <CustomLayout 
         currentPage={currentPage} 
-        onPageChange={setCurrentPage}
+        onPageChange={handlePageChange}
         onLogout={handleLogout}
       >
         {renderContent()}
