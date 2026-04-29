@@ -161,16 +161,14 @@ const WorkHourList = ({ type }) => {
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
           {record.status === 'Rejected' && (
-            <>
-              <Button 
-                type="primary" 
-                size="small" 
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(record)}
-              >
-                修改
-              </Button>
-            </>
+            <Button 
+              type="primary" 
+              size="small" 
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record)}
+            >
+              修改
+            </Button>
           )}
           {(record.status === 'Pending' || record.status === 'Rejected') && (
             <Button 
@@ -179,7 +177,7 @@ const WorkHourList = ({ type }) => {
               icon={<CheckOutlined />}
               onClick={() => handleResubmit(record)}
             >
-              提交
+              {record.status === 'Rejected' ? '重新提交' : '提交'}
             </Button>
           )}
         </div>

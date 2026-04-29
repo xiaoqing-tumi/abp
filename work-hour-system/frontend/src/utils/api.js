@@ -258,6 +258,9 @@ export const workHourAPI = {
         if (index >= 0) {
           mockWorkHours[index].status = 'Submitted';
           mockWorkHours[index].submitTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          mockWorkHours[index].rejectReason = '';
+          mockWorkHours[index].approverName = '';
+          mockWorkHours[index].approveTime = '';
           saveMockData(mockWorkHours);
           return {
             data: {
