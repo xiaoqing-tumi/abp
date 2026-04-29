@@ -204,7 +204,7 @@ const CustomLayout = ({ currentPage, onPageChange, children }) => {
                   boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
                 }}
               />
-              <div style={{ fontSize: 11, color: '#666666', fontWeight: 500 }}>
+              <div style={{ fontSize: 13, color: '#333333', fontWeight: 600 }}>
                 {user?.role === 'Admin' && '管理员'}
                 {user?.role === 'Director' && '高管'}
                 {user?.role === 'DeptManager' && '部门经理'}
