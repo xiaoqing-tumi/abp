@@ -18,7 +18,30 @@ const mockProjects = [
   { projectCode: 'PRJ004', projectName: '智慧城市项目', customerName: '政府单位', managerCode: 'MGR001', managerName: '王经理', status: 1, startDate: '2026-04-01', endDate: '2027-03-31' },
 ];
 
-let mockWorkHours = [];
+const STORAGE_KEY = 'workhour_mock_data';
+
+const loadMockData = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      return data.workHours || [];
+    }
+  } catch (e) {
+    console.error('Failed to load mock data:', e);
+  }
+  return [];
+};
+
+const saveMockData = (workHours) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ workHours }));
+  } catch (e) {
+    console.error('Failed to save mock data:', e);
+  }
+};
+
+let mockWorkHours = loadMockData();
 
 let mockSyncLogs = [
   { id: 1, syncTime: '2026-04-29 08:00:00', syncType: '自动同步', status: '成功', recordCount: 156, duration: '2.3s' },
@@ -28,7 +51,7 @@ let mockSyncLogs = [
   { id: 5, syncTime: '2026-04-27 20:00:00', syncType: '自动同步', status: '失败', recordCount: 0, duration: '0.5s', errorMessage: '网络连接超时' },
 ];
 
-let nextWorkHourId = 8;
+let nextWorkHourId = mockWorkHours.length > 0 ? Math.max(...mockWorkHours.map(w => w.id)) + 1 : 1;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -171,6 +194,7 @@ export const workHourAPI = {
           createTime: new Date().toISOString().replace('T', ' ').slice(0, 19),
         };
         mockWorkHours.push(newWorkHour);
+        saveMockData(mockWorkHours);
         return {
           data: {
             code: 200,
@@ -193,6 +217,7 @@ export const workHourAPI = {
             ...data,
             projectName: project?.projectName || data.projectCode,
           };
+          saveMockData(mockWorkHours);
           return {
             data: {
               code: 200,
@@ -215,6 +240,7 @@ export const workHourAPI = {
     if (USE_MOCK) {
       return mockRequest(() => {
         mockWorkHours = mockWorkHours.filter(w => w.id !== id);
+        saveMockData(mockWorkHours);
         return {
           data: {
             code: 200,
@@ -232,6 +258,7 @@ export const workHourAPI = {
         if (index >= 0) {
           mockWorkHours[index].status = 'Submitted';
           mockWorkHours[index].submitTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          saveMockData(mockWorkHours);
           return {
             data: {
               code: 200,
@@ -298,6 +325,7 @@ export const workHourAPI = {
           mockWorkHours[index].status = newStatus;
           mockWorkHours[index].approverName = approverName || '管理员';
           mockWorkHours[index].approveTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
+          saveMockData(mockWorkHours);
           return {
             data: {
               code: 200,
@@ -324,6 +352,7 @@ export const workHourAPI = {
           mockWorkHours[index].approverName = approverName || '管理员';
           mockWorkHours[index].approveTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
           mockWorkHours[index].rejectReason = reason || '未填写驳回原因';
+          saveMockData(mockWorkHours);
           return {
             data: {
               code: 200,
