@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select, Tag } from 'antd';
 import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { workHourAPI } from '../utils/api';
+import { workHourAPI, mockProjects } from '../utils/api';
 
 const { Option } = Select;
 const { TextArea } = Modal;
@@ -56,10 +56,23 @@ const ApprovalList = () => {
   const fetchWorkHours = async () => {
     setLoading(true);
     try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await workHourAPI.getWorkHours({});
       if (response.data.code === 200) {
         setAllData(response.data.data);
-        setFilteredData(response.data.data);
+        
+        if (user.role === 'PM') {
+          const pmPending = response.data.data.filter(w => {
+            const project = mockProjects.find(p => p.projectCode === w.projectCode);
+            return project && project.managerCode === user.personCode && w.status === 'Submitted';
+          });
+          setFilteredData(pmPending);
+        } else if (user.role === 'DeptManager') {
+          const deptPending = response.data.data.filter(w => w.status === 'Submitted' || w.status === 'PMApproved');
+          setFilteredData(deptPending);
+        } else {
+          setFilteredData(response.data.data);
+        }
       }
     } catch (error) {
       message.error('加载失败');
@@ -71,9 +84,9 @@ const ApprovalList = () => {
   const handleApprove = async (id) => {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const response = await workHourAPI.approveWorkHour(id, user.name);
+      const response = await workHourAPI.approveWorkHour(id, user.name, user.role);
       if (response.data.code === 200) {
-        message.success('审批通过');
+        message.success(response.data.message);
         fetchWorkHours();
       } else {
         message.error(response.data.message);
@@ -114,6 +127,7 @@ const ApprovalList = () => {
   const statusMap = {
     Pending: { label: '待提交', color: 'default' },
     Submitted: { label: '待审批', color: 'processing' },
+    PMApproved: { label: '项目经理已审批', color: 'warning' },
     Approved: { label: '已审批', color: 'success' },
     Rejected: { label: '已驳回', color: 'error' },
   };
@@ -270,7 +284,7 @@ const ApprovalList = () => {
             >
               详情
             </Button>
-            {record.status === 'Submitted' && currentUser?.role !== 'Admin' && (
+            {(record.status === 'Submitted' || record.status === 'PMApproved') && currentUser?.role !== 'Admin' && (
               <>
                 <Button
                   type="primary"

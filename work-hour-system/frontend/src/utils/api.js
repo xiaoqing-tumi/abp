@@ -249,29 +249,59 @@ export const workHourAPI = {
     }
     return api.post(`/work-hours/${id}/submit`);
   },
-  getPendingApprovals: () => {
+  getPendingApprovals: (user) => {
     if (USE_MOCK) {
-      return mockRequest(() => ({
-        data: {
-          code: 200,
-          data: mockWorkHours.filter(w => w.status === 'Submitted'),
-        },
-      }));
+      return mockRequest(() => {
+        let pending = mockWorkHours.filter(w => w.status === 'Submitted');
+        
+        if (user?.role === 'PM') {
+          pending = pending.filter(w => {
+            const project = mockProjects.find(p => p.projectCode === w.projectCode);
+            return project && project.managerCode === user.personCode;
+          });
+        } else if (user?.role === 'DeptManager') {
+          pending = pending.filter(w => w.status === 'Submitted' || w.status === 'PMApproved');
+        }
+        
+        return {
+          data: {
+            code: 200,
+            data: pending,
+          },
+        };
+      });
     }
     return api.get('/work-hours/pending-approvals');
   },
-  approveWorkHour: (id, approverName) => {
+  approveWorkHour: (id, approverName, approverRole) => {
     if (USE_MOCK) {
       return mockRequest(() => {
         const index = mockWorkHours.findIndex(w => w.id === id);
         if (index >= 0) {
-          mockWorkHours[index].status = 'Approved';
+          const record = mockWorkHours[index];
+          let newStatus = 'Approved';
+          let message = '审批通过';
+          
+          if (approverRole === 'PM') {
+            newStatus = 'PMApproved';
+            message = '项目经理已审批，等待部门经理审批';
+          } else if (approverRole === 'DeptManager') {
+            if (record.status === 'Submitted') {
+              newStatus = 'Approved';
+              message = '部门经理直接审批通过';
+            } else if (record.status === 'PMApproved') {
+              newStatus = 'Approved';
+              message = '部门经理审批通过，流程完成';
+            }
+          }
+          
+          mockWorkHours[index].status = newStatus;
           mockWorkHours[index].approverName = approverName || '管理员';
           mockWorkHours[index].approveTime = new Date().toISOString().replace('T', ' ').slice(0, 19);
           return {
             data: {
               code: 200,
-              message: '审批通过',
+              message,
             },
           };
         }
@@ -283,7 +313,7 @@ export const workHourAPI = {
         };
       });
     }
-    return api.post(`/work-hours/${id}/approve`, { approverName });
+    return api.post(`/work-hours/${id}/approve`, { approverName, approverRole });
   },
   rejectWorkHour: (id, approverName, reason) => {
     if (USE_MOCK) {
@@ -655,4 +685,5 @@ export const projectAPI = {
   },
 };
 
+export { mockProjects };
 export default api;
