@@ -144,6 +144,9 @@ const WorkHourList = ({ type }) => {
         } else if (text === 'Pending') {
           color = 'warning';
           label = '待提交';
+        } else if (text === 'PMApproved') {
+          color = 'orange';
+          label = '项目经理已审批';
         }
         return <Tag color={color}>{label}</Tag>;
       }
@@ -158,16 +161,18 @@ const WorkHourList = ({ type }) => {
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
           {record.status === 'Rejected' && (
-            <Button 
-              type="primary" 
-              size="small" 
-              icon={<EditOutlined />}
-              onClick={() => handleEdit(record)}
-            >
-              修改
-            </Button>
+            <>
+              <Button 
+                type="primary" 
+                size="small" 
+                icon={<EditOutlined />}
+                onClick={() => handleEdit(record)}
+              >
+                修改
+              </Button>
+            </>
           )}
-          {record.status === 'Pending' && (
+          {(record.status === 'Pending' || record.status === 'Rejected') && (
             <Button 
               type="primary" 
               size="small" 
