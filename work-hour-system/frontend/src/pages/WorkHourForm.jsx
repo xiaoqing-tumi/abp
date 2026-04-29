@@ -11,10 +11,14 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
   const [projects, setProjects] = useState([]);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [todayHours, setTodayHours] = useState(0);
+  const [selectedDateHours, setSelectedDateHours] = useState(0);
+  const [allWorkHours, setAllWorkHours] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs(workDate));
 
   const maxHours = 8;
-  const remainingHours = maxHours - todayHours;
+  const remainingHours = maxHours - selectedDateHours;
+  const isToday = dayjs(selectedDate).isSame(dayjs(), 'day');
+  const isPastDate = dayjs(selectedDate).isBefore(dayjs(), 'day');
 
   useEffect(() => {
     basicDataAPI.getMyProjects().then((response) => {
@@ -22,33 +26,44 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
         setProjects(response.data.data);
       }
     });
-    fetchTodayHours();
+    fetchAllWorkHours();
   }, []);
 
-  const fetchTodayHours = async () => {
+  const fetchAllWorkHours = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const response = await workHourAPI.getWorkHours({ personCode: user.personCode });
       if (response.data.code === 200) {
-        const today = dayjs().format('YYYY-MM-DD');
-        const todayRecords = response.data.data.filter(item => 
-          dayjs(item.workDate).format('YYYY-MM-DD') === today
-        );
-        const hours = todayRecords.reduce((sum, item) => sum + (item.workHours || 0), 0);
-        setTodayHours(hours);
+        setAllWorkHours(response.data.data);
+        calculateSelectedDateHours(response.data.data, dayjs(workDate));
       }
     } catch (error) {
-      console.error('Failed to fetch today hours:', error);
+      console.error('Failed to fetch work hours:', error);
     }
+  };
+
+  const calculateSelectedDateHours = (workHoursData, date) => {
+    const targetDate = dayjs(date).format('YYYY-MM-DD');
+    const dateRecords = workHoursData.filter(item => 
+      dayjs(item.workDate).format('YYYY-MM-DD') === targetDate
+    );
+    const hours = dateRecords.reduce((sum, item) => sum + (item.workHours || 0), 0);
+    setSelectedDateHours(hours);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    calculateSelectedDateHours(allWorkHours, date);
   };
 
   useEffect(() => {
     form.setFieldsValue({ workDate: dayjs(workDate) });
+    setSelectedDate(dayjs(workDate));
   }, [workDate, form]);
 
   const handleSubmit = async (values) => {
     if (values.workHours > remainingHours) {
-      message.error(`今日剩余可填报工时为 ${remainingHours} 小时`);
+      message.error(`${dayjs(values.workDate).format('YYYY-MM-DD')}剩余可填报工时为 ${remainingHours} 小时`);
       return;
     }
 
@@ -64,8 +79,8 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
       if (response.data.code === 200) {
         message.success('工时填报成功');
         form.resetFields();
-        form.setFieldsValue({ workDate: dayjs(workDate), workHours: 1 });
-        fetchTodayHours();
+        form.setFieldsValue({ workDate: selectedDate, workHours: 1 });
+        fetchAllWorkHours();
         if (onSubmit) {
           onSubmit();
         }
@@ -91,8 +106,8 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             }}
           >
             <Statistic
-              title="今日已填报"
-              value={todayHours}
+              title={`${dayjs(selectedDate).format('YYYY-MM-DD')}已填报`}
+              value={selectedDateHours}
               suffix="小时"
               prefix={<ClockCircleOutlined style={{ color: '#1890ff' }} />}
               valueStyle={{ color: '#1890ff', fontSize: 24, fontWeight: 600 }}
@@ -195,6 +210,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                   style={{ width: '100%' }}
                   placeholder="选择日期"
                   size="large"
+                  onChange={handleDateChange}
                 />
               </Form.Item>
             </Col>
@@ -225,7 +241,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
             name="workContent"
           >
             <TextArea
-              placeholder="请简要描述今日工作内容..."
+              placeholder="请简要描述工作内容..."
               rows={3}
               style={{ borderRadius: 6 }}
             />
@@ -247,7 +263,7 @@ const WorkHourForm = ({ workDate, onSubmit }) => {
                 borderRadius: 6,
               }}
             >
-              保存工时
+              {isPastDate && !isToday ? `补填${dayjs(selectedDate).format('MM月DD日')}工时` : '保存工时'}
             </Button>
           </Form.Item>
         </Form>
