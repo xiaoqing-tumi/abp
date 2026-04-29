@@ -15,18 +15,15 @@ import './App.css';
 function App() {
   const { isLoggedIn, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState('workhour');
-  const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const pathname = window.location.pathname;
     
-    if (pathname.includes('login') || !token) {
+    if (!token) {
       setShowLogin(true);
-      if (token) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
+    } else {
+      setShowLogin(false);
     }
   }, []);
 
@@ -38,7 +35,7 @@ function App() {
     logout();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/?login';
+    window.location.href = '/';
   };
 
   const renderContent = () => {
