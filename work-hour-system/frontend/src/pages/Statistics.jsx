@@ -6,7 +6,7 @@ import { workHourAPI, basicDataAPI } from '../utils/api';
 
 const { RangePicker } = DatePicker;
 
-const Statistics = () => {
+const Statistics = ({ onPageChange }) => {
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, 'day'), dayjs()]);
   const [workHours, setWorkHours] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -166,16 +166,24 @@ const Statistics = () => {
                 borderRadius: 6,
                 border: '1px solid #f0f0f0',
                 boxShadow: 'none',
+                cursor: 'pointer',
               }}
+              hoverable
+              onClick={() => onPageChange && onPageChange('overtime')}
             >
-              <Statistic
-                title="加班工时"
-                value={personalStats.overtimeHours || 0}
-                suffix="小时"
-                prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
-                valueStyle={{ color: '#fa8c16', fontSize: 24, fontWeight: 600 }}
-                loading={loading}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <Statistic
+                    title="加班工时"
+                    value={personalStats.overtimeHours || 0}
+                    suffix="小时"
+                    prefix={<ArrowUpOutlined style={{ color: '#fa8c16' }} />}
+                    valueStyle={{ color: '#fa8c16', fontSize: 24, fontWeight: 600 }}
+                    loading={loading}
+                  />
+                </div>
+                <div style={{ color: '#fa8c16', fontSize: 12, marginRight: 8 }}>点击查看详情 →</div>
+              </div>
             </Card>
           </Col>
           <Col span={6}>

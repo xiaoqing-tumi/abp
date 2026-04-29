@@ -8,6 +8,7 @@ import ApprovalList from './pages/ApprovalList';
 import Statistics from './pages/Statistics';
 import AdminPanel from './pages/AdminPanel';
 import DataSync from './pages/DataSync';
+import OvertimeList from './pages/OvertimeList';
 import CustomLayout from './components/Layout';
 import { useAuth } from './stores/authStore';
 import './App.css';
@@ -47,11 +48,13 @@ function App() {
       case 'approval':
         return <ApprovalList />;
       case 'statistics':
-        return <Statistics />;
+        return <Statistics onPageChange={setCurrentPage} />;
       case 'admin':
         return <AdminPanel />;
       case 'sync':
         return <DataSync />;
+      case 'overtime':
+        return <OvertimeList />;
       default:
         return <WorkHourForm workDate={new Date()} onSubmit={() => {}} />;
     }
