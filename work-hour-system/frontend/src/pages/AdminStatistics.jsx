@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card, Row, Col, Statistic, message, Table } from 'antd';
-import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, TeamOutlined, FolderOutlined, OfficeBuildingOutlined } from '@ant-design/icons';
+import { BarChartOutlined, UserOutlined, ClockCircleOutlined, ArrowUpOutlined, TeamOutlined, FolderOutlined, BankOutlined } from '@ant-design/icons';
 import { statisticsAPI } from '../utils/api';
 
 const AdminStatistics = () => {
@@ -208,7 +208,7 @@ const AdminStatistics = () => {
           >
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <OfficeBuildingOutlined style={{ color: '#722ed1' }} />
+                <BankOutlined style={{ color: '#722ed1' }} />
                 <span style={{ fontWeight: 500 }}>部门工时统计</span>
               </div>
             </div>
