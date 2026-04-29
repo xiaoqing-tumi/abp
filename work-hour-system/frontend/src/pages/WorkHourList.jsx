@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Table, Button, DatePicker, Card, Row, Col, message, Tag, Tooltip, Modal } from 'antd';
-import { ClockCircleOutlined, UserOutlined, CalendarOutlined, SearchOutlined, FilterOutlined, EditOutlined, AlertCircleOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, UserOutlined, CalendarOutlined, SearchOutlined, FilterOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -96,9 +96,9 @@ const WorkHourList = ({ type }) => {
 
   const statusMap = {
     Pending: { label: '待提交', color: 'default', icon: <ClockCircleOutlined /> },
-    Submitted: { label: '待审批', color: 'processing', icon: <AlertCircleOutlined /> },
+    Submitted: { label: '待审批', color: 'processing', icon: <ExclamationCircleOutlined /> },
     Approved: { label: '已审批', color: 'success', icon: <UserOutlined /> },
-    Rejected: { label: '已驳回', color: 'error', icon: <AlertCircleOutlined /> },
+    Rejected: { label: '已驳回', color: 'error', icon: <ExclamationCircleOutlined /> },
   };
 
   const columns = [
@@ -385,7 +385,7 @@ const WorkHourList = ({ type }) => {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 40, height: 40, background: '#fff2f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <AlertCircleOutlined style={{ color: '#ff4d4f', fontSize: 20 }} />
+                    <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: 20 }} />
                   </div>
                   <div>
                     <div style={{ fontSize: 12, color: '#999' }}>已驳回</div>
@@ -448,7 +448,7 @@ const WorkHourList = ({ type }) => {
         </div>
         <div style={{ marginTop: 12, padding: 12, background: '#fff7e6', borderRadius: 4 }}>
           <div style={{ fontSize: 12, color: '#fa8c16' }}>
-            <AlertCircleOutlined style={{ marginRight: 4 }} />
+            <ExclamationCircleOutlined style={{ marginRight: 4 }} />
             修改后状态将变为"待提交"，需要重新提交审批
           </div>
         </div>

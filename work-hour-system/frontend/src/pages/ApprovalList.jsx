@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Table, Button, Card, Row, Col, message, Modal, Checkbox, Dropdown, Select, Tag } from 'antd';
-import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined, AlertCircleOutlined } from '@ant-design/icons';
+import { EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined, ColumnWidthOutlined, FilterOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { workHourAPI } from '../utils/api';
 
@@ -536,7 +536,7 @@ const ApprovalList = () => {
         <div style={{ padding: 16 }}>
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontWeight: 500, color: '#666', marginBottom: 8 }}>
-              <AlertCircleOutlined style={{ marginRight: 4 }} />
+              <ExclamationCircleOutlined style={{ marginRight: 4 }} />
               请填写驳回原因
             </div>
             <TextArea
