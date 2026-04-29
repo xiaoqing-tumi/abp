@@ -159,7 +159,7 @@ const Statistics = ({ onPageChange }) => {
                 cursor: 'pointer',
               }}
               hoverable
-              onClick={() => onPageChange && onPageChange('history')}
+              onClick={() => onPageChange && onPageChange('normal')}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>

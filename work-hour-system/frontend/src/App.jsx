@@ -43,6 +43,9 @@ function App() {
     if (page === 'overtime') {
       setListType('overtime');
       setCurrentPage('history');
+    } else if (page === 'normal') {
+      setListType('normal');
+      setCurrentPage('history');
     } else if (page === 'history') {
       setListType(null);
       setCurrentPage('history');

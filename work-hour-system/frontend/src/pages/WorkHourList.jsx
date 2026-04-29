@@ -13,6 +13,7 @@ const WorkHourList = ({ type }) => {
 
   const pageTitle = useMemo(() => {
     if (type === 'overtime') return '加班记录';
+    if (type === 'normal') return '正常工时记录';
     return '工时记录';
   }, [type]);
 
@@ -27,6 +28,8 @@ const WorkHourList = ({ type }) => {
       const params = { personCode: user.personCode };
       if (type === 'overtime') {
         params.workType = 'overtime';
+      } else if (type === 'normal') {
+        params.workType = 'normal';
       }
       const response = await workHourAPI.getWorkHours(params);
       if (response.data.code === 200) {
